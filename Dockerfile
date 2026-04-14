@@ -20,7 +20,7 @@ RUN apt-get update && apt-get install -y \
 
 # Install Python dependencies
 COPY requirements.txt /code/
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --default-timeout=100 --no-cache-dir -r requirements.txt
 
 # Download NLTK data (optimized for smaller size)
 RUN python -m nltk.downloader stopwords punkt
