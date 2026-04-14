@@ -25,18 +25,18 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Download NLTK data (optimized for smaller size)
 RUN python -m nltk.downloader stopwords punkt
 
-# Run as non-root user (standard for cloud safety)
-RUN useradd -m -u 1000 user
+# Copy project 
+COPY . /code/
 
-# Copy project WITH proper ownership
-COPY --chown=user:user . /code/
+# Run collectstatic for Whitenoise BEFORE switching users to avoid permission errors
+RUN python manage.py collectstatic --noinput
+
+# Run as non-root user (standard for cloud safety)
+RUN useradd -m -u 1000 user && chown -R user:user /code
 
 USER user
 ENV HOME=/home/user \
     PATH=/home/user/.local/bin:$PATH
-
-# Run collectstatic for Whitenoise
-RUN python manage.py collectstatic --noinput
 
 # Let Docker know which port we expect (informational)
 EXPOSE 8000
