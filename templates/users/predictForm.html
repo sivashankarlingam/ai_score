@@ -57,7 +57,7 @@
           </div>
           <textarea class="aes-input" name="final_text" id="output"
                     placeholder="Start typing or paste your essay here…"
-                    style="min-height:220px; font-size:0.96rem; line-height:1.7;"></textarea>
+                    style="min-height:220px; font-size:0.96rem; line-height:1.7;">{% if final_text %}{{ final_text }}{% endif %}</textarea>
           <p class="form-hint"><i class="bi bi-info-circle me-1"></i>Minimum 150 words recommended for accurate scoring.</p>
         </div>
 

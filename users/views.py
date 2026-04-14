@@ -21,6 +21,9 @@ from sklearn.metrics import mean_squared_error
 from PIL import Image
 import pytesseract
 
+# Set path for windows
+pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+
 
 # =========================
 # USER REGISTRATION
@@ -263,15 +266,23 @@ def prediction(request):
         # OCR
         if image_file:
 
-            img = Image.open(image_file)
-            final_text = pytesseract.image_to_string(img)
+            try:
+                img = Image.open(image_file)
+                # Fallback path if pytesseract isn't in PATH natively
+                final_text = pytesseract.image_to_string(img)
+            except Exception as e:
+                return render(
+                    request,
+                    "users/predictForm.html",
+                    {"score": "OCR Error: Tesseract is not installed or configured correctly."}
+                )
 
-        if not final_text:
+        if not final_text or str(final_text).strip() == "":
 
             return render(
                 request,
                 "users/predictForm.html",
-                {"score": "Please enter essay text"}
+                {"score": "Please enter essay text", "final_text": final_text}
             )
 
         stop_words = set(stopwords.words("english"))
@@ -306,7 +317,7 @@ def prediction(request):
         return render(
             request,
             "users/predictForm.html",
-            {"score": score}
+            {"score": score, "final_text": final_text}   # keep text in form
         )
 
     return render(request, "users/predictForm.html")
