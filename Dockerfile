@@ -38,5 +38,5 @@ ENV HOME=/home/user \
 # Let Docker know which port we expect (informational)
 EXPOSE 8000
 
-# Bind to the dynamic PORT assigned by the platform
-CMD ["sh", "-c", "gunicorn --bind 0.0.0.0:$PORT Automatic_English_Essay_Scoring_Algorithm_Based_On_Ml.wsgi:application"]
+# Run migrations then start the project using gunicorn
+CMD ["sh", "-c", "python manage.py migrate && gunicorn --bind 0.0.0.0:$PORT Automatic_English_Essay_Scoring_Algorithm_Based_On_Ml.wsgi:application"]
