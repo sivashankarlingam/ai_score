@@ -76,20 +76,42 @@
         <!-- Voice panel -->
         <div id="tabVoice" class="tab-panel mb-4" style="display:none;">
           <label class="aes-label">Voice Dictation</label>
-          <div style="background:var(--col-bg); border:1.5px solid var(--col-border); border-radius:var(--radius-sm); padding:1.75rem; text-align:center;">
-            <div id="voiceStatus" style="font-size:0.88rem; color:var(--col-text-muted); margin-bottom:16px;">
-              <i class="bi bi-mic me-1"></i>Press "Start Recording". Works best in Google Chrome.
+          <div style="background:var(--col-bg); border:1.5px solid var(--col-border); border-radius:var(--radius-sm); padding:1.5rem;">
+
+            <!-- Status Bar -->
+            <div id="voiceStatus" style="display:flex; align-items:center; gap:8px; font-size:0.88rem; color:var(--col-text-muted); margin-bottom:14px; padding:10px 14px; background:var(--col-surface-2); border-radius:var(--radius-sm);">
+              <i class="bi bi-mic"></i>
+              <span id="voiceStatusText">Press "Start Recording". Works best in Google Chrome.</span>
             </div>
-            <div style="display:flex; gap:10px; justify-content:center;">
+
+            <!-- Live Transcript Box -->
+            <div style="margin-bottom:14px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                <label class="aes-label" style="margin:0;">Live Transcript</label>
+                <span style="font-size:0.75rem; color:var(--col-text-muted);" id="voice-word-count">0 words</span>
+              </div>
+              <div id="voiceLiveBox"
+                   style="min-height:140px; max-height:260px; overflow-y:auto; background:var(--col-surface); border:1.5px solid var(--col-border); border-radius:var(--radius-sm); padding:0.85rem 1rem; font-size:0.95rem; line-height:1.75; color:var(--col-text-primary); white-space:pre-wrap;">
+                <span id="voicePlaceholder" style="color:var(--col-text-muted); font-style:italic;">Your spoken words will appear here as you speak…</span>
+                <span id="voiceFinal"></span><span id="voiceInterim" style="color:var(--col-blue-400);"></span>
+              </div>
+            </div>
+
+            <!-- Buttons -->
+            <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
               <button type="button" class="btn-aes-primary" onclick="startSpeech()" id="mic-btn" style="min-width:160px;">
                 <i class="bi bi-record-circle"></i> Start Recording
               </button>
-              <button type="button" class="btn-aes-outline" onclick="stopSpeech()">
+              <button type="button" class="btn-aes-outline" onclick="stopSpeech()" id="stop-btn" disabled style="min-width:120px;">
                 <i class="bi bi-stop-circle"></i> Stop
               </button>
+              <button type="button" class="btn-aes-outline" onclick="clearVoice()" style="min-width:100px;">
+                <i class="bi bi-trash3"></i> Clear
+              </button>
             </div>
-            <p style="font-size:0.78rem; color:var(--col-text-muted); margin-top:12px; margin-bottom:0;">
-              Transcribed text will appear in the Type/Paste tab automatically.
+
+            <p style="font-size:0.78rem; color:var(--col-text-muted); margin-top:12px; margin-bottom:0; text-align:center;">
+              <i class="bi bi-info-circle me-1"></i>Text is automatically copied to the essay field when you stop.
             </p>
           </div>
         </div>
@@ -167,9 +189,16 @@
 <style>
   .tab-btn { background: transparent; color: var(--col-text-secondary); }
   .tab-btn.active { background: var(--col-surface); color: var(--col-navy); box-shadow: var(--shadow-sm); }
+
+  @keyframes pulse-mic {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.4; }
+  }
+  .mic-pulsing { animation: pulse-mic 1s ease-in-out infinite; }
 </style>
 
 <script>
+  /* ── Tab switching ────────────────────────────────────────── */
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -181,43 +210,139 @@
     });
   });
 
+  /* ── Char count ────────────────────────────────────────────── */
   function updateCharCount() {
-    document.getElementById('char-count').innerText = document.getElementById('output').value.length + ' characters';
+    document.getElementById('char-count').innerText =
+      document.getElementById('output').value.length + ' characters';
   }
   document.getElementById('output').addEventListener('input', updateCharCount);
 
+  /* ── Image upload ──────────────────────────────────────────── */
   document.getElementById('essay_image').addEventListener('change', function() {
     const el = document.getElementById('fileName');
     if (this.files[0]) { el.textContent = '✓ ' + this.files[0].name; el.style.display = 'block'; }
   });
-
   const zone = document.getElementById('uploadZoneLabel');
   ['dragenter','dragover'].forEach(e => zone.addEventListener(e, ev => { ev.preventDefault(); zone.classList.add('drag-over'); }));
   ['dragleave','drop'].forEach(e => zone.addEventListener(e, () => zone.classList.remove('drag-over')));
 
+  /* ── Voice recognition ─────────────────────────────────────── */
   let recognition;
+  let finalTranscript = '';
+
+  function updateVoiceLiveBox() {
+    const finalEl   = document.getElementById('voiceFinal');
+    const placeholder = document.getElementById('voicePlaceholder');
+    const wordCount = document.getElementById('voice-word-count');
+
+    finalEl.textContent = finalTranscript;
+    placeholder.style.display = finalTranscript ? 'none' : 'inline';
+
+    const words = finalTranscript.trim() ? finalTranscript.trim().split(/\s+/).length : 0;
+    wordCount.textContent = words + ' word' + (words !== 1 ? 's' : '');
+
+    // Scroll to bottom of live box
+    const box = document.getElementById('voiceLiveBox');
+    box.scrollTop = box.scrollHeight;
+  }
+
   function startSpeech() {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) { alert("Speech Recognition works only in Google Chrome"); return; }
+    if (!SR) {
+      alert('Speech Recognition is only supported in Google Chrome. Please switch browsers.');
+      return;
+    }
+
+    finalTranscript = document.getElementById('output').value || '';
+    document.getElementById('voiceFinal').textContent = finalTranscript;
+    document.getElementById('voicePlaceholder').style.display = finalTranscript ? 'none' : 'inline';
+
     recognition = new SR();
-    recognition.lang = "en-US";
-    recognition.continuous = true;
-    document.getElementById('mic-btn').innerHTML = '<span class="spinner-grow spinner-grow-sm me-2"></span>Listening…';
-    document.getElementById('voiceStatus').innerHTML = '<i class="bi bi-record-circle-fill text-danger me-1"></i>Recording in progress…';
+    recognition.lang        = 'en-US';
+    recognition.continuous  = true;
+    recognition.interimResults = true;
+
+    // UI — recording state
+    const micBtn  = document.getElementById('mic-btn');
+    const stopBtn = document.getElementById('stop-btn');
+    micBtn.innerHTML  = '<span class="spinner-grow spinner-grow-sm me-2"></span>Listening…';
+    micBtn.disabled   = true;
+    stopBtn.disabled  = false;
+    micBtn.classList.add('mic-pulsing');
+
+    document.getElementById('voiceStatusText').innerHTML =
+      '<i class="bi bi-record-circle-fill text-danger"></i>&nbsp;Recording in progress — speak clearly…';
+
     recognition.onresult = function(event) {
-      let text = "";
-      for (let i = 0; i < event.results.length; i++) text += event.results[i][0].transcript;
-      document.getElementById("output").value = text;
+      let interim = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        if (event.results[i].isFinal) {
+          finalTranscript += event.results[i][0].transcript + ' ';
+        } else {
+          interim += event.results[i][0].transcript;
+        }
+      }
+      updateVoiceLiveBox();
+      document.getElementById('voiceInterim').textContent = interim;
+
+      // Mirror into essay textarea live
+      document.getElementById('output').value = finalTranscript + interim;
       updateCharCount();
     };
+
+    recognition.onerror = function(event) {
+      document.getElementById('voiceStatusText').textContent =
+        'Error: ' + event.error + '. Please check microphone permissions.';
+      stopSpeech();
+    };
+
+    recognition.onend = function() {
+      // If still in recording state (auto-ended), restart for continuous capture
+      if (!document.getElementById('mic-btn').disabled === false) return;
+    };
+
     recognition.start();
   }
+
   function stopSpeech() {
     if (recognition) {
       recognition.stop();
-      document.getElementById('mic-btn').innerHTML = '<i class="bi bi-record-circle me-1"></i>Start Recording';
-      document.getElementById('voiceStatus').innerHTML = '<i class="bi bi-check-circle-fill text-success me-1"></i>Recording stopped. Switch to Type/Paste to review.';
     }
+
+    const micBtn  = document.getElementById('mic-btn');
+    const stopBtn = document.getElementById('stop-btn');
+    micBtn.innerHTML = '<i class="bi bi-record-circle me-1"></i> Start Recording';
+    micBtn.disabled  = false;
+    micBtn.classList.remove('mic-pulsing');
+    stopBtn.disabled = true;
+
+    // Clear interim
+    document.getElementById('voiceInterim').textContent = '';
+
+    // Copy final transcript into textarea
+    document.getElementById('output').value = finalTranscript.trim();
+    updateCharCount();
+    updateVoiceLiveBox();
+
+    document.getElementById('voiceStatusText').innerHTML =
+      '<i class="bi bi-check-circle-fill text-success"></i>&nbsp;Recording stopped. Review your text below, then click Generate AI Score.';
+
+    // Auto-switch to Type/Paste tab so user can see & edit the result
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector('[data-tab="text"]').classList.add('active');
+    document.getElementById('tabText').style.display  = 'block';
+    document.getElementById('tabImage').style.display = 'none';
+    document.getElementById('tabVoice').style.display = 'none';
+  }
+
+  function clearVoice() {
+    finalTranscript = '';
+    document.getElementById('voiceFinal').textContent   = '';
+    document.getElementById('voiceInterim').textContent = '';
+    document.getElementById('voicePlaceholder').style.display = 'inline';
+    document.getElementById('voice-word-count').textContent   = '0 words';
+    document.getElementById('output').value = '';
+    updateCharCount();
   }
 </script>
 
