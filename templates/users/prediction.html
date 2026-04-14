@@ -1,82 +1,115 @@
-{% extends 'users/userbase.html'%}
-{%block contents%}
+{% extends 'users/userbase.html' %}
+{% block contents %}
 
+<!-- Page Header -->
+<div class="page-header anim-fade-up">
+  <p class="section-label"><i class="bi bi-bar-chart-line me-1"></i>ML Prediction</p>
+  <h1 class="page-header-title">Prediction Output</h1>
+  <p class="page-header-sub">Model inference results for the submitted input data.</p>
+</div>
 
-  <!DOCTYPE html>
-  <html>
-  <style>
-  input[type=text], select {
-    width: 100%;
-    padding: 12px 20px;
-    margin: 8px 0;
-    display: inline-block;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-  }
-  
-  input[type=submit] {
-    width: 100%;
-    background-color: #4CAF50;
-    color: white;
-    padding: 14px 20px;
-    margin: 8px 0;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  input[type=submit]:hover {
-    background-color: #45a049;
-  }
-  
-  .formDiv {
-    margin: 0 200px;
-    border-radius: 5px;
-    background-color: #f2f2f2;
-    padding: 20px;
-  }
-  </style>
-  <body>
-  
-  
-  <div class="formDiv">
-    <h2 align="center" style="color:rgb(50, 19, 190);font-weight:bold;">ThePricePredictionOfSneakersBasedOnMachineLearning: {{y_pred}}</h2>
-
-    <form action="" method="POST">
-      {% csrf_token %}
-      <label>Order_date</label>
-      <input type="text" id="fname" name="Order_date" required>
-  
-      <label>Brand</label>
-      <input type="text" id="lname" name="Brand" required>
-
-      <label>Sneaker_Name</label>
-      <input type="text" id="lname" name="Sneaker_Name" required>
-
-      <label >Retail_Price</label>
-      <input type="text" id="lname" name="Retail_Price" required >
-
-      <label >Release_Date</label>
-      <input type="text" id="lname" name="Release_Date" required >
-
-      <label >Shoe_Size</label>
-      <input type="text" id="lname" name="Shoe_Size" required >
-
-      <label >Buyer</label>
-      <input type="text" id="lname" name="Buyer" required >
-      
-    
-      <input type="submit" value="Submit">
-    </form>
-    
+<!-- Result card -->
+{% if y_pred %}
+<div class="score-result-panel mb-4 anim-fade-up anim-delay-1">
+  <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:20px;">
+    <div>
+      <p style="font-size:0.75rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:rgba(255,255,255,0.50); margin-bottom:6px;">
+        PREDICTION RESULT
+      </p>
+      <div style="font-size:1rem; font-weight:600; color:#fff; margin-bottom:4px;">
+        Model inference completed successfully.
+      </div>
+      <div style="font-size:0.83rem; color:rgba(255,255,255,0.50);">
+        Output from the trained LSTM regression model.
+      </div>
+    </div>
+    <div style="background:rgba(255,255,255,0.12); border:1.5px solid rgba(255,255,255,0.2); border-radius:var(--radius-md); padding:20px 32px; text-align:center; flex-shrink:0;">
+      <div style="font-size:0.7rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:rgba(255,255,255,0.45); margin-bottom:6px;">PREDICTED VALUE</div>
+      <div class="score-number" style="font-size:3.2rem;">{{ y_pred }}</div>
+    </div>
   </div>
-  
-  </body>
-  </html>
-  
-  
-  
+</div>
+{% endif %}
 
+<!-- Form card -->
+<div class="row g-4 justify-content-center anim-fade-up anim-delay-2">
+  <div class="col-lg-8">
+    <div class="aes-card">
+      <p class="section-label mb-4"><i class="bi bi-input-cursor me-1"></i>Input Parameters</p>
 
-{%endblock%}
+      <form action="" method="POST" novalidate>
+        {% csrf_token %}
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="aes-label" for="Order_date">Order Date</label>
+            <input class="aes-input" type="text" id="Order_date" name="Order_date" placeholder="e.g. 2023-01-15" required>
+          </div>
+
+          <div class="col-md-6">
+            <label class="aes-label" for="Brand">Brand</label>
+            <input class="aes-input" type="text" id="Brand" name="Brand" placeholder="e.g. Nike" required>
+          </div>
+
+          <div class="col-md-6">
+            <label class="aes-label" for="Sneaker_Name">Sneaker Name</label>
+            <input class="aes-input" type="text" id="Sneaker_Name" name="Sneaker_Name" placeholder="e.g. Air Max 90" required>
+          </div>
+
+          <div class="col-md-6">
+            <label class="aes-label" for="Retail_Price">Retail Price</label>
+            <input class="aes-input" type="text" id="Retail_Price" name="Retail_Price" placeholder="e.g. 120" required>
+          </div>
+
+          <div class="col-md-6">
+            <label class="aes-label" for="Release_Date">Release Date</label>
+            <input class="aes-input" type="text" id="Release_Date" name="Release_Date" placeholder="e.g. 2022-06-01" required>
+          </div>
+
+          <div class="col-md-6">
+            <label class="aes-label" for="Shoe_Size">Shoe Size</label>
+            <input class="aes-input" type="text" id="Shoe_Size" name="Shoe_Size" placeholder="e.g. 10.5" required>
+          </div>
+
+          <div class="col-md-12">
+            <label class="aes-label" for="Buyer">Buyer</label>
+            <input class="aes-input" type="text" id="Buyer" name="Buyer" placeholder="e.g. New York" required>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-3" style="border-top:1px solid var(--col-border);">
+          <button type="submit" class="btn-aes-primary" style="padding:0.85rem 2rem; font-size:0.96rem;">
+            <i class="bi bi-cpu"></i>
+            Submit for Prediction
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Info sidebar -->
+  <div class="col-lg-4">
+    <div class="aes-card" style="padding:1.6rem; border-left:3px solid var(--col-blue-400);">
+      <p class="section-label mb-3"><i class="bi bi-info-circle me-1"></i>About This Model</p>
+      <p style="font-size:0.85rem; color:var(--col-text-secondary); line-height:1.7; margin-bottom:1rem;">
+        This model predicts the resale price of sneakers based on historical market data using machine learning regression.
+      </p>
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <div style="display:flex; justify-content:space-between; font-size:0.82rem; padding:7px 0; border-bottom:1px solid var(--col-surface-2);">
+          <span style="color:var(--col-text-secondary);">Algorithm</span>
+          <span style="font-weight:700; font-family:monospace;">Regression</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:0.82rem; padding:7px 0; border-bottom:1px solid var(--col-surface-2);">
+          <span style="color:var(--col-text-secondary);">Output</span>
+          <span style="font-weight:700; font-family:monospace;">Predicted Price</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:0.82rem; padding:7px 0;">
+          <span style="color:var(--col-text-secondary);">Framework</span>
+          <span style="font-weight:700; font-family:monospace;">scikit-learn</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

@@ -2,219 +2,159 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>User Dashboard | AES</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Dashboard | AES</title>
 
-    <style>
-        :root {
-            --sidebar-width: 280px;
-            --primary-color: #0866FF;
-            --bg-color: #F0F2F5;
-            --card-shadow: 0 2px 4px rgba(0,0,0,0.08);
-        }
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="{% static 'assets/css/style.css' %}" rel="stylesheet">
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
-            margin: 0;
-            display: flex;
-        }
-
-        /* Sidebar Styling */
-        .sidebar {
-            width: var(--sidebar-width);
-            height: 100vh;
-            background: white;
-            position: fixed;
-            border-right: 1px solid #ddd;
-            display: flex;
-            flex-direction: column;
-            z-index: 1000;
-        }
-
-        .sidebar-header {
-            padding: 24px;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .sidebar-brand {
-            font-family: 'Outfit', sans-serif;
-            font-weight: 700;
-            font-size: 1.5rem;
-            color: var(--primary-color);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .nav-menu {
-            padding: 20px 12px;
-            flex: 1;
-        }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            color: #1C1E21;
-            text-decoration: none;
-            font-weight: 500;
-            border-radius: 8px;
-            margin-bottom: 4px;
-            transition: all 0.2s;
-        }
-
-        .nav-link:hover {
-            background-color: #F2F2F2;
-        }
-
-        .nav-link.active {
-            background-color: #E7F3FF;
-            color: var(--primary-color);
-        }
-
-        .nav-link i {
-            font-size: 1.2rem;
-        }
-
-        .sidebar-footer {
-            padding: 20px;
-            border-top: 1px solid #f0f0f0;
-        }
-
-        /* Main Content */
-        .main-content {
-            margin-left: var(--sidebar-width);
-            flex: 1;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .top-navbar {
-            height: 70px;
-            background: white;
-            border-bottom: 1px solid #ddd;
-            display: flex;
-            align-items: center;
-            padding: 0 30px;
-            justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 900;
-        }
-
-        .content-area {
-            padding: 30px;
-            flex: 1;
-        }
-
-        /* Dashboard Styles */
-        .dashboard-header {
-            margin-bottom: 30px;
-        }
-
-        .welcome-text {
-            font-family: 'Outfit', sans-serif;
-            font-weight: 700;
-            color: #1C1E21;
-        }
-
-        .modern-card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: var(--card-shadow);
-            padding: 24px;
-            border: none;
-        }
-
-        .btn-action {
-            background: var(--primary-color);
-            color: white;
-            border-radius: 8px;
-            padding: 10px 20px;
-            font-weight: 600;
-            border: none;
-            transition: 0.2s;
-        }
-
-        .btn-action:hover {
-            background: #0055D3;
-            transform: translateY(-1px);
-        }
-    </style>
+  <style>
+    body { overflow-x: hidden; }
+    @media (max-width: 991px) {
+      .sidebar-overlay {
+        display: none; position: fixed; inset: 0;
+        background: rgba(0,0,0,0.45); z-index: 1050;
+      }
+      .sidebar-overlay.visible { display: block; }
+    }
+  </style>
 </head>
-<body>
+<body style="background:var(--col-bg); display:flex; margin:0; min-height:100vh;">
 
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <a href="{% url 'UserHome' %}" class="sidebar-brand">
-                <i class="bi bi-pencil-square"></i>
-                <span>AES Score</span>
-            </a>
-        </div>
-        
-        <div class="nav-menu">
-            <a href="{% url 'UserHome' %}" class="nav-link {% if request.resolver_match.url_name == 'UserHome' %}active{% endif %}">
-                <i class="bi bi-house-door"></i>
-                <span>Dashboard</span>
-            </a>
-            <a href="{% url 'prediction' %}" class="nav-link {% if request.resolver_match.url_name == 'prediction' %}active{% endif %}">
-                <i class="bi bi-magic"></i>
-                <span>Analyze Essay</span>
-            </a>
-            <a href="{% url 'DatasetView' %}" class="nav-link {% if request.resolver_match.url_name == 'DatasetView' %}active{% endif %}">
-                <i class="bi bi-database"></i>
-                <span>Training Data</span>
-            </a>
-            <a href="{% url 'training' %}" class="nav-link {% if request.resolver_match.url_name == 'training' %}active{% endif %}">
-                <i class="bi bi-cpu"></i>
-                <span>Model Stats</span>
-            </a>
-        </div>
+  <!-- ── Sidebar ───────────────────────────────────────────── -->
+  <aside class="aes-sidebar" id="sidebar" style="background:var(--col-surface); border-right:1px solid var(--col-border);">
 
-        <div class="sidebar-footer">
-            <a href="{% url 'index' %}" class="nav-link text-danger">
-                <i class="bi bi-box-arrow-left"></i>
-                <span>Logout</span>
-            </a>
+    <!-- Brand -->
+    <div class="sidebar-brand-wrap" style="border-bottom:1px solid var(--col-border);">
+      <a href="{% url 'UserHome' %}" class="sidebar-brand-link">
+        <div class="aes-brand-icon">
+          <i class="bi bi-pencil-fill"></i>
         </div>
+        <span class="sidebar-brand-name" style="color:var(--col-navy);">AES Score</span>
+      </a>
     </div>
 
-    <!-- Main Content -->
-    <div class="main-content">
-        <nav class="top-navbar">
-            <div class="d-flex align-items-center gap-3">
-                <span class="text-muted fw-medium">User Panel</span>
-            </div>
-            <div class="d-flex align-items-center gap-3">
-                <div class="text-end">
-                    <div class="fw-bold">{{ request.session.loggeduser }}</div>
-                    <div class="text-muted small">Student Account</div>
-                </div>
-                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; font-weight: 700;">
-                    {{ request.session.loggeduser|slice:":1"|upper }}
-                </div>
-            </div>
-        </nav>
+    <!-- Nav -->
+    <nav class="sidebar-nav">
+      <p class="sidebar-section-label" style="color:var(--col-text-muted);">Menu</p>
 
-        <div class="content-area">
-            {% block contents %}
-            {% endblock %}
+      <a href="{% url 'UserHome' %}"
+         class="sidebar-link {% if request.resolver_match.url_name == 'UserHome' %}active{% endif %}"
+         style="{% if request.resolver_match.url_name != 'UserHome' %}color:var(--col-text-secondary);{% endif %}">
+        <i class="bi bi-speedometer2"></i>
+        <span>Dashboard</span>
+      </a>
+
+      <a href="{% url 'prediction' %}"
+         class="sidebar-link {% if request.resolver_match.url_name == 'prediction' %}active{% endif %}"
+         style="{% if request.resolver_match.url_name != 'prediction' %}color:var(--col-text-secondary);{% endif %}">
+        <i class="bi bi-stars"></i>
+        <span>Analyse Essay</span>
+      </a>
+
+      <a href="{% url 'DatasetView' %}"
+         class="sidebar-link {% if request.resolver_match.url_name == 'DatasetView' %}active{% endif %}"
+         style="{% if request.resolver_match.url_name != 'DatasetView' %}color:var(--col-text-secondary);{% endif %}">
+        <i class="bi bi-database"></i>
+        <span>Training Data</span>
+      </a>
+
+      <a href="{% url 'training' %}"
+         class="sidebar-link {% if request.resolver_match.url_name == 'training' %}active{% endif %}"
+         style="{% if request.resolver_match.url_name != 'training' %}color:var(--col-text-secondary);{% endif %}">
+        <i class="bi bi-cpu"></i>
+        <span>Model Stats</span>
+      </a>
+
+      <p class="sidebar-section-label" style="color:var(--col-text-muted); margin-top:16px;">Account</p>
+
+      <a href="{% url 'index' %}" class="sidebar-link" style="color:var(--col-danger);">
+        <i class="bi bi-box-arrow-left"></i>
+        <span>Logout</span>
+      </a>
+    </nav>
+
+    <!-- Sidebar Footer: user info -->
+    <div class="sidebar-footer-wrap" style="border-top:1px solid var(--col-border);">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <div style="width:34px; height:34px; border-radius:50%; background:var(--col-blue-50); border:1.5px solid var(--col-blue-100); display:flex; align-items:center; justify-content:center; color:var(--col-navy); font-size:0.85rem; font-weight:700; flex-shrink:0;">
+          {{ request.session.loggeduser|slice:":1"|upper }}
         </div>
+        <div>
+          <div style="font-size:0.85rem; font-weight:600; color:var(--col-text-primary);">{{ request.session.loggeduser }}</div>
+          <div style="font-size:0.75rem; color:var(--col-text-muted);">Student Account</div>
+        </div>
+        <div style="margin-left:auto;">
+          <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--col-success);"></span>
+        </div>
+      </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    {% block scripts %}
-    {% endblock %}
+  </aside>
+
+  <!-- Mobile overlay -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+  <!-- ── Main Content ─────────────────────────────────────── -->
+  <div class="admin-main-content">
+
+    <!-- Top Bar -->
+    <header class="admin-topbar">
+      <div class="d-flex align-items-center gap-3">
+        <!-- Mobile toggle -->
+        <button class="d-lg-none border-0 bg-transparent p-1"
+                onclick="toggleSidebar()"
+                style="color:var(--col-text-secondary); font-size:1.4rem; cursor:pointer;">
+          <i class="bi bi-list"></i>
+        </button>
+
+        <!-- Breadcrumb -->
+        <div class="aes-breadcrumb d-none d-md-flex">
+          <a href="{% url 'UserHome' %}">Home</a>
+          <span class="aes-breadcrumb-sep">/</span>
+          <span>
+            {% if request.resolver_match.url_name == 'prediction' %}Analyse Essay
+            {% elif request.resolver_match.url_name == 'DatasetView' %}Training Data
+            {% elif request.resolver_match.url_name == 'training' %}Model Stats
+            {% else %}Dashboard{% endif %}
+          </span>
+        </div>
+      </div>
+
+      <!-- Right: user info -->
+      <div class="d-flex align-items-center gap-3">
+        <div class="d-none d-sm-block text-end">
+          <div style="font-size:0.88rem; font-weight:700; color:var(--col-text-primary);">{{ request.session.loggeduser }}</div>
+          <div style="font-size:0.75rem; color:var(--col-text-muted);">Student · LSTM-v4.11</div>
+        </div>
+        <div style="width:36px; height:36px; border-radius:50%; background:var(--col-blue-50); border:1.5px solid var(--col-blue-100); display:flex; align-items:center; justify-content:center; color:var(--col-navy); font-size:0.85rem; font-weight:700;">
+          {{ request.session.loggeduser|slice:":1"|upper }}
+        </div>
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <div class="admin-body-area">
+      {% block contents %}
+      {% endblock %}
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('open');
+      document.getElementById('sidebarOverlay').classList.toggle('visible');
+    }
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('sidebarOverlay').classList.remove('visible');
+    }
+  </script>
+  {% block scripts %}{% endblock %}
 </body>
 </html>

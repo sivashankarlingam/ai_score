@@ -219,6 +219,7 @@ h1,h2,h3,h4,h5,h6 {
   outline: none;
   transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
   -webkit-appearance: none;
+  appearance: none;
 }
 
 .aes-input:focus {

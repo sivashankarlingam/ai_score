@@ -1,56 +1,130 @@
 {% extends 'users/userbase.html' %}
 {% block contents %}
 
-<div class="dashboard-header animate__animated animate__fadeIn">
-    <h2 class="welcome-text">Training Dataset Explorer</h2>
-    <p class="text-muted">Explore the historical essay marks used for sequence training.</p>
+<!-- Page Header -->
+<div class="page-header anim-fade-up d-flex flex-wrap align-items-start justify-content-between gap-3">
+  <div>
+    <p class="section-label"><i class="bi bi-database me-1"></i>ASAP Dataset</p>
+    <h1 class="page-header-title">Training Dataset Explorer</h1>
+    <p class="page-header-sub">Explore the historical essay marks used for LSTM sequence training.</p>
+  </div>
+  <div style="display:flex; gap:10px; flex-wrap:wrap;">
+    <div class="metric-card" style="padding:12px 20px; min-width:110px; text-align:left;">
+      <div class="metric-value" style="font-size:1.4rem;">~12K</div>
+      <div class="metric-name">Total Essays</div>
+    </div>
+    <div class="metric-card" style="padding:12px 20px; min-width:110px; text-align:left;">
+      <div class="metric-value" style="font-size:1.4rem; color:var(--col-blue-400);">8</div>
+      <div class="metric-name">Prompt Sets</div>
+    </div>
+  </div>
 </div>
 
-<div class="modern-card animate__animated animate__fadeInUp border-0 shadow-sm overflow-hidden p-0">
-    <div class="bg-primary p-4 text-white d-flex justify-content-between align-items-center">
-        <div>
-            <h5 class="fw-bold mb-1">CSV File Preview</h5>
-            <div class="small fw-normal opacity-75">Dataset: training_set_rel3.tsv</div>
-        </div>
-        <i class="bi bi-file-earmark-spreadsheet fs-2 opacity-50"></i>
-    </div>
-    
-    <div class="p-4 bg-dark">
-        <div class="table-responsive" style="max-height: 600px;">
-            {% if data %}
-                <div class="font-monospace text-light small py-3" style="line-height: 1.6;">
-                    {{ data|safe }}
-                </div>
-            {% else %}
-                <div class="text-center py-5 text-white opacity-50">
-                    <i class="bi bi-cloud-slash fs-1 d-block mb-2"></i>
-                    No data available in this preview.
-                </div>
-            {% endif %}
-        </div>
-    </div>
+<!-- Dataset Table Card -->
+<div class="aes-table-wrap anim-fade-up anim-delay-1" style="margin-bottom:28px;">
 
-    <div class="p-4 bg-light border-top text-center">
-        <p class="text-muted small mb-0">The data above is rendered directly from the training source. Column 'domain1_score' represents the ground truth labels.</p>
+  <!-- Toolbar -->
+  <div style="padding:14px 20px; border-bottom:1px solid var(--col-border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; background:var(--col-surface);">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <span style="font-size:0.85rem; font-weight:600; color:var(--col-text-secondary);">
+        <i class="bi bi-file-earmark-spreadsheet me-1"></i>
+        training_set_rel3.tsv
+      </span>
+      <span class="aes-badge badge-active">
+        <i class="bi bi-check-circle me-1"></i>Loaded
+      </span>
     </div>
+    <span style="font-size:0.78rem; color:var(--col-text-muted);">
+      <i class="bi bi-arrow-left-right me-1"></i>Scroll horizontally for all columns
+    </span>
+  </div>
+
+  <!-- Data -->
+  <div style="overflow-x:auto; overflow-y:auto; max-height:560px;" class="dataset-scroll">
+    {% if data %}
+      {{ data|safe }}
+    {% else %}
+      <table class="aes-table">
+        <tbody>
+          <tr>
+            <td style="padding:60px; text-align:center; color:var(--col-text-muted);">
+              <i class="bi bi-database-slash" style="font-size:3rem; opacity:0.2; display:block; margin-bottom:12px;"></i>
+              <div style="font-size:0.9rem; font-weight:600;">No dataset loaded.</div>
+              <div style="font-size:0.82rem; margin-top:4px; opacity:0.7;">Place the ASAP TSV in the configured path and reload.</div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    {% endif %}
+  </div>
+
+  <!-- Footer -->
+  <div style="padding:12px 20px; border-top:1px solid var(--col-border); font-size:0.8rem; color:var(--col-text-muted); background:var(--col-surface);">
+    Column <code style="background:var(--col-blue-50); color:var(--col-navy); padding:1px 6px; border-radius:4px;">domain1_score</code>
+    represents the ground-truth human-assigned score used as training labels. · ASAP Dataset (Kaggle AES Competition)
+  </div>
+</div>
+
+<!-- Info strip -->
+<div class="row g-3 anim-fade-up anim-delay-2">
+  <div class="col-md-4">
+    <div class="aes-card" style="padding:1.4rem;">
+      <div class="feature-icon-wrap bg-blue-50" style="color:var(--col-blue-400); width:42px; height:42px; font-size:1.1rem;">
+        <i class="bi bi-journals"></i>
+      </div>
+      <h6 style="font-weight:700; margin-bottom:5px;">8 Prompt Sets</h6>
+      <p style="font-size:0.83rem; color:var(--col-text-secondary); margin:0;">Argumentative, persuasive, narrative and source-dependent genres with varying score ranges.</p>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="aes-card" style="padding:1.4rem;">
+      <div class="feature-icon-wrap" style="background:var(--col-success-bg); color:var(--col-success); width:42px; height:42px; font-size:1.1rem;">
+        <i class="bi bi-people"></i>
+      </div>
+      <h6 style="font-weight:700; margin-bottom:5px;">Human-Scored Labels</h6>
+      <p style="font-size:0.83rem; color:var(--col-text-secondary); margin:0;">All essays carry dual human-rater scores enabling Quadratic Weighted Kappa evaluation.</p>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="aes-card" style="padding:1.4rem;">
+      <div class="feature-icon-wrap" style="background:var(--col-warning-bg); color:var(--col-warning); width:42px; height:42px; font-size:1.1rem;">
+        <i class="bi bi-shield-check"></i>
+      </div>
+      <h6 style="font-weight:700; margin-bottom:5px;">Pre-processed</h6>
+      <p style="font-size:0.83rem; color:var(--col-text-secondary); margin:0;">Text is cleaned, tokenised, and scores normalised with min-max scaling before training.</p>
+    </div>
+  </div>
 </div>
 
 <style>
-    /* Styling for the pandas HTML table if rendered inside safe */
-    .dataframe {
-        width: 100% !important;
-        border-collapse: collapse !important;
-        color: #e9ecef !important;
-    }
-    .dataframe th, .dataframe td {
-        padding: 8px 12px !important;
-        border: 1px solid #495057 !important;
-    }
-    .dataframe th {
-        background: #343a40 !important;
-        color: #0866FF !important;
-        text-align: left !important;
-    }
+  /* Pandas dataframe rendered via |safe */
+  .dataset-scroll table, .dataset-scroll .dataframe {
+    width: 100% !important; border-collapse: collapse !important;
+    font-family: var(--font-body); font-size: 0.82rem; min-width: 800px;
+  }
+  .dataset-scroll thead th, .dataset-scroll .dataframe th {
+    position: sticky; top: 0; z-index: 10;
+    background: var(--col-surface-2) !important;
+    color: var(--col-text-secondary) !important;
+    font-size: 0.72rem !important; font-weight: 700 !important;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 12px 16px !important; border: none !important;
+    border-bottom: 1px solid var(--col-border) !important;
+    white-space: nowrap; text-align: left !important;
+  }
+  .dataset-scroll tbody tr, .dataset-scroll .dataframe tr {
+    border-bottom: 1px solid var(--col-surface-2) !important;
+    transition: background 0.15s;
+  }
+  .dataset-scroll tbody tr:hover, .dataset-scroll .dataframe tr:hover {
+    background: var(--col-blue-50) !important;
+  }
+  .dataset-scroll td, .dataset-scroll .dataframe td {
+    padding: 10px 16px !important; color: var(--col-text-primary) !important;
+    border: none !important; vertical-align: top;
+    max-width: 280px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .dataset-scroll td:first-child { color: var(--col-text-muted) !important; font-weight: 600 !important; }
 </style>
 
 {% endblock %}

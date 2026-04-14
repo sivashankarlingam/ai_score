@@ -1,58 +1,125 @@
 {% extends 'admins/adminbase.html' %}
 {% block contents %}
 
-<div class="dashboard-header animate__animated animate__fadeIn mb-4">
-    <h2 class="welcome-text">Edit User: {{ user.name }}</h2>
-    <p class="text-muted">Update administrative details for the student.</p>
+<!-- Page Header -->
+<div class="page-header anim-fade-up">
+  <div class="aes-breadcrumb mb-2">
+    <a href="{% url 'RegisterUsersView' %}">Manage Users</a>
+    <span class="aes-breadcrumb-sep">/</span>
+    <span>Edit User</span>
+  </div>
+  <p class="section-label"><i class="bi bi-pencil me-1"></i>Edit Record</p>
+  <h1 class="page-header-title">{{ user.name }}</h1>
+  <p class="page-header-sub">Update administrative details for this student account.</p>
 </div>
 
-<div class="modern-card animate__animated animate__fadeInUp border-0 shadow-sm col-md-8">
-    <form method="POST" action="{% url 'EditUsers' %}">
+<div class="row g-4 anim-fade-up anim-delay-1">
+
+  <!-- ── Edit Form ──────────────────────────────────────────── -->
+  <div class="col-lg-8">
+    <div class="aes-card">
+      <form method="POST" action="{% url 'EditUsers' %}" novalidate>
         {% csrf_token %}
         <input type="hidden" name="uid" value="{{ user.id }}">
-        
-        <div class="row g-3">
-            <div class="col-md-6">
-                <label for="name" class="form-label fw-bold">Student Name</label>
-                <input type="text" class="form-control bg-light border-0" id="name" name="name" value="{{ user.name }}" required>
-            </div>
-            
-            <div class="col-md-6">
-                <label for="email" class="form-label fw-bold">Email Address</label>
-                <input type="email" class="form-control bg-light border-0" id="email" name="email" value="{{ user.email }}" required>
-            </div>
-            
-            <div class="col-md-6">
-                <label for="mobile" class="form-label fw-bold">Contact Number</label>
-                <input type="text" class="form-control bg-light border-0" id="mobile" name="mobile" value="{{ user.mobile }}" required>
-            </div>
-            
-            <div class="col-md-6">
-                <label for="locality" class="form-label fw-bold">Locality</label>
-                <input type="text" class="form-control bg-light border-0" id="locality" name="locality" value="{{ user.locality }}" required>
-            </div>
-            
-            <div class="col-md-12">
-                <label for="address" class="form-label fw-bold">Address</label>
-                <input type="text" class="form-control bg-light border-0" id="address" name="address" value="{{ user.address }}" required>
-            </div>
-            
-            <div class="col-md-6">
-                <label for="city" class="form-label fw-bold">City</label>
-                <input type="text" class="form-control bg-light border-0" id="city" name="city" value="{{ user.city }}" required>
-            </div>
-            
-            <div class="col-md-6">
-                <label for="state" class="form-label fw-bold">State</label>
-                <input type="text" class="form-control bg-light border-0" id="state" name="state" value="{{ user.state }}" required>
-            </div>
+
+        <!-- Personal Info -->
+        <p class="section-label mb-3"><i class="bi bi-person-vcard me-1"></i>Personal Information</p>
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <label class="aes-label" for="name">Student Name</label>
+            <input class="aes-input" type="text" id="name" name="name" value="{{ user.name }}" required>
+          </div>
+          <div class="col-md-6">
+            <label class="aes-label" for="email">Email Address</label>
+            <input class="aes-input" type="email" id="email" name="email" value="{{ user.email }}" required>
+          </div>
+          <div class="col-md-6">
+            <label class="aes-label" for="mobile">Contact Number</label>
+            <input class="aes-input" type="text" id="mobile" name="mobile" value="{{ user.mobile }}" required>
+          </div>
+          <div class="col-md-6">
+            <label class="aes-label" for="locality">Locality</label>
+            <input class="aes-input" type="text" id="locality" name="locality" value="{{ user.locality }}" required>
+          </div>
         </div>
-        
-        <div class="mt-4 pt-3 border-top d-flex gap-2">
-            <button type="submit" class="btn btn-primary px-4 fw-bold">Update Details</button>
-            <a href="{% url 'RegisterUsersView' %}" class="btn btn-light px-4 fw-bold text-secondary">Cancel</a>
+
+        <!-- Address -->
+        <hr style="border-color:var(--col-border); margin:0 0 1.5rem;">
+        <p class="section-label mb-3"><i class="bi bi-geo-alt me-1"></i>Location Details</p>
+        <div class="row g-3 mb-4">
+          <div class="col-md-12">
+            <label class="aes-label" for="address">Full Address</label>
+            <input class="aes-input" type="text" id="address" name="address" value="{{ user.address }}" required>
+          </div>
+          <div class="col-md-6">
+            <label class="aes-label" for="city">City</label>
+            <input class="aes-input" type="text" id="city" name="city" value="{{ user.city }}" required>
+          </div>
+          <div class="col-md-6">
+            <label class="aes-label" for="state">State</label>
+            <input class="aes-input" type="text" id="state" name="state" value="{{ user.state }}" required>
+          </div>
         </div>
-    </form>
+
+        <!-- Actions -->
+        <div style="display:flex; gap:12px; flex-wrap:wrap; padding-top:1rem; border-top:1px solid var(--col-border);">
+          <button type="submit" class="btn-aes-primary" style="padding:0.8rem 2rem;">
+            <i class="bi bi-check-lg"></i> Save Changes
+          </button>
+          <a href="{% url 'RegisterUsersView' %}" class="btn-aes-outline" style="padding:0.8rem 2rem;">
+            <i class="bi bi-x-lg"></i> Cancel
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── User Summary Sidebar ────────────────────────────────── -->
+  <div class="col-lg-4 anim-fade-up anim-delay-2">
+
+    <!-- Current info card -->
+    <div class="aes-card mb-3" style="padding:1.6rem;">
+      <p class="section-label mb-3"><i class="bi bi-person-badge me-1"></i>Current Record</p>
+      <div style="display:flex; align-items:center; gap:14px; margin-bottom:1.25rem;">
+        <div class="avatar-initials" style="width:48px; height:48px; font-size:1.1rem;">
+          {{ user.name|slice:":1"|upper }}
+        </div>
+        <div>
+          <div style="font-weight:700; color:var(--col-text-primary);">{{ user.name }}</div>
+          <div style="font-size:0.82rem; color:var(--col-text-muted);">{{ user.email }}</div>
+        </div>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:0;">
+        <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--col-surface-2); font-size:0.83rem;">
+          <span style="color:var(--col-text-secondary);">Login ID</span>
+          <code style="background:var(--col-blue-50); color:var(--col-navy); padding:1px 8px; border-radius:4px;">{{ user.loginid }}</code>
+        </div>
+        <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--col-surface-2); font-size:0.83rem;">
+          <span style="color:var(--col-text-secondary);">Mobile</span>
+          <span style="font-weight:600;">{{ user.mobile }}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--col-surface-2); font-size:0.83rem;">
+          <span style="color:var(--col-text-secondary);">City</span>
+          <span style="font-weight:600;">{{ user.city }}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; padding:8px 0; font-size:0.83rem;">
+          <span style="color:var(--col-text-secondary);">Status</span>
+          <span class="aes-badge {% if user.status == 'waiting' %}badge-waiting{% else %}badge-active{% endif %}">
+            {{ user.status|title }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Warning note -->
+    <div class="aes-alert aes-alert-warning" style="border-radius:var(--radius-md);">
+      <i class="bi bi-exclamation-triangle-fill flex-shrink-0"></i>
+      <span style="font-size:0.83rem; line-height:1.6;">
+        Changes made here are permanent and will immediately affect this student's account.
+      </span>
+    </div>
+
+  </div>
 </div>
 
 {% endblock %}

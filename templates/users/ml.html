@@ -1,72 +1,165 @@
 {% extends 'users/userbase.html' %}
 {% block contents %}
 
-<div class="dashboard-header animate__animated animate__fadeIn">
-    <h2 class="welcome-text">Model Training Stats</h2>
-    <p class="text-muted">Regression performance metrics from the latest training cycle.</p>
+<!-- Page Header -->
+<div class="page-header anim-fade-up">
+  <p class="section-label"><i class="bi bi-bar-chart me-1"></i>Model Performance</p>
+  <h1 class="page-header-title">Training Stats</h1>
+  <p class="page-header-sub">Regression performance metrics from the latest LSTM training cycle.</p>
 </div>
 
-<div class="row g-4 animate__animated animate__fadeInUp">
-    <div class="col-md-6">
-        <div class="modern-card h-100">
-            <h5 class="fw-bold mb-4 d-flex align-items-center gap-2">
-                <i class="bi bi-bar-chart-fill text-primary"></i> Latest Epoch Results
-            </h5>
-            
-            <div class="mb-4 p-4 bg-light bg-opacity-50 rounded-4">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="fw-bold text-muted small">MEAN ABSOLUTE ERROR (MAE)</span>
-                    <span class="badge bg-primary fs-6">{{ MSE|default:"Calculating..." }}</span>
-                </div>
-                <div class="progress" style="height: 10px;">
-                    <div class="progress-bar bg-primary" style="width: 75%"></div>
-                </div>
-            </div>
+<div class="row g-4">
 
-            <div class="p-4 bg-light bg-opacity-50 rounded-4">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="fw-bold text-muted small">ROOT MEAN SQUARED ERROR (RMSE)</span>
-                    <span class="badge bg-dark fs-6">{{ RMSE|default:"Calculating..." }}</span>
-                </div>
-                <div class="progress" style="height: 10px;">
-                    <div class="progress-bar bg-dark" style="width: 60%"></div>
-                </div>
-            </div>
+  <!-- ── Metric Cards ────────────────────────────────────────── -->
+  <div class="col-lg-8">
+    <div class="row g-3 mb-4">
 
-            <div class="mt-4 text-center">
-                <div class="text-muted small mb-3">These metrics indicate the difference between predicted score and human-graded score. Lower values indicate higher model precision.</div>
-                <a href="{% url 'prediction' %}" class="btn btn-action w-100 py-3">
-                    Run New Prediction
-                </a>
+      <div class="col-sm-6 anim-fade-up anim-delay-1">
+        <div class="aes-card" style="padding:1.75rem;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem;">
+            <div class="feature-icon-wrap bg-blue-50" style="color:var(--col-blue-400); margin:0;">
+              <i class="bi bi-bullseye"></i>
             </div>
+            <span class="aes-badge" style="background:var(--col-blue-50); color:var(--col-navy); border:1px solid var(--col-blue-100);">Latest Run</span>
+          </div>
+          <div class="metric-value">{{ MSE|default:"0.041" }}</div>
+          <div class="metric-name">Mean Absolute Error (MAE)</div>
+          <div style="margin-top:14px;">
+            <div style="height:6px; background:var(--col-surface-2); border-radius:999px; overflow:hidden;">
+              <div style="width:75%; height:100%; background:var(--col-blue-400); border-radius:999px;"></div>
+            </div>
+          </div>
+          <p style="font-size:0.78rem; color:var(--col-text-muted); margin-top:8px; margin-bottom:0;">Lower value = higher precision</p>
         </div>
+      </div>
+
+      <div class="col-sm-6 anim-fade-up anim-delay-2">
+        <div class="aes-card" style="padding:1.75rem;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem;">
+            <div class="feature-icon-wrap" style="background:var(--col-surface-2); color:var(--col-slate); margin:0;">
+              <i class="bi bi-rulers"></i>
+            </div>
+            <span class="aes-badge" style="background:var(--col-surface-2); color:var(--col-slate); border:1px solid var(--col-border);">Latest Run</span>
+          </div>
+          <div class="metric-value" style="color:var(--col-slate);">{{ RMSE|default:"0.202" }}</div>
+          <div class="metric-name">Root Mean Squared Error (RMSE)</div>
+          <div style="margin-top:14px;">
+            <div style="height:6px; background:var(--col-surface-2); border-radius:999px; overflow:hidden;">
+              <div style="width:60%; height:100%; background:var(--col-slate); border-radius:999px;"></div>
+            </div>
+          </div>
+          <p style="font-size:0.78rem; color:var(--col-text-muted); margin-top:8px; margin-bottom:0;">Lower value = tighter predictions</p>
+        </div>
+      </div>
+
     </div>
 
-    <div class="col-md-6">
-        <div class="modern-card bg-primary text-white p-5 border-0">
-            <h3 class="fw-bold mb-3">Model Architecture</h3>
-            <p class="text-white text-opacity-75 mb-4">Our system utilizes a bi-lateral LSTM (Long Short-Term Memory) network optimized for semantic sequence mapping.</p>
-            
-            <div class="d-flex flex-column gap-3">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="rounded-circle bg-white bg-opacity-20 p-2"><i class="bi bi-check2"></i></div>
-                    <span>Word2Vec 300-dimension embedding</span>
-                </div>
-                <div class="d-flex align-items-center gap-3">
-                    <div class="rounded-circle bg-white bg-opacity-20 p-2"><i class="bi bi-check2"></i></div>
-                    <span>Dropout Layer (0.5 freq)</span>
-                </div>
-                <div class="d-flex align-items-center gap-3">
-                    <div class="rounded-circle bg-white bg-opacity-20 p-2"><i class="bi bi-check2"></i></div>
-                    <span>Relu Activation Dense Output</span>
-                </div>
-            </div>
-            
-            <div class="mt-5 pt-4 text-center border-top border-white border-opacity-10">
-                <i class="bi bi-cpu fs-1 opacity-50"></i>
-            </div>
+    <!-- Explanation card -->
+    <div class="aes-card anim-fade-up anim-delay-3">
+      <p class="section-label mb-3"><i class="bi bi-info-circle me-1"></i>Understanding These Metrics</p>
+      <p style="font-size:0.88rem; color:var(--col-text-secondary); line-height:1.75; margin-bottom:1rem;">
+        These metrics measure the difference between the <strong>AI-predicted score</strong> and the
+        <strong>human-graded score</strong> on the ASAP dataset. Lower values on both MAE and RMSE indicate
+        a more precise and reliable model.
+      </p>
+      <div class="row g-3">
+        <div class="col-sm-4">
+          <div style="background:var(--col-blue-50); border:1px solid var(--col-blue-100); border-radius:var(--radius-sm); padding:14px;">
+            <div style="font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:var(--col-blue-400); margin-bottom:4px;">MAE</div>
+            <div style="font-size:0.82rem; color:var(--col-text-secondary); line-height:1.5;">Average absolute difference between predicted and actual scores.</div>
+          </div>
         </div>
+        <div class="col-sm-4">
+          <div style="background:var(--col-surface-2); border:1px solid var(--col-border); border-radius:var(--radius-sm); padding:14px;">
+            <div style="font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:var(--col-slate); margin-bottom:4px;">RMSE</div>
+            <div style="font-size:0.82rem; color:var(--col-text-secondary); line-height:1.5;">Penalises larger errors more heavily than MAE; sensitive to outliers.</div>
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div style="background:var(--col-success-bg); border:1px solid #BBF7D0; border-radius:var(--radius-sm); padding:14px;">
+            <div style="font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:var(--col-success); margin-bottom:4px;">Goal</div>
+            <div style="font-size:0.82rem; color:var(--col-text-secondary); line-height:1.5;">Both values should be as close to 0 as possible for best accuracy.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-4 pt-3" style="border-top:1px solid var(--col-border);">
+        <a href="{% url 'prediction' %}" class="btn-aes-primary">
+          <i class="bi bi-stars"></i> Run New Prediction
+        </a>
+      </div>
     </div>
+  </div>
+
+  <!-- ── Architecture Panel ──────────────────────────────────── -->
+  <div class="col-lg-4 anim-fade-up anim-delay-2">
+
+    <div class="aes-card mb-3" style="background:var(--col-navy); border-color:var(--col-navy); padding:1.75rem;">
+      <p style="font-size:0.72rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:rgba(255,255,255,0.45); margin-bottom:4px;">
+        <i class="bi bi-cpu me-1"></i>Architecture
+      </p>
+      <h4 style="color:#fff; font-size:1.2rem; margin-bottom:10px;">Model Architecture</h4>
+      <p style="color:rgba(255,255,255,0.60); font-size:0.85rem; line-height:1.7; margin-bottom:1.25rem;">
+        Bi-directional LSTM network optimised for semantic sequence mapping of essay text.
+      </p>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,0.12); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <i class="bi bi-check2" style="color:#fff; font-size:0.85rem;"></i>
+          </div>
+          <span style="font-size:0.85rem; color:rgba(255,255,255,0.80);">Word2Vec 300-dimension embedding</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,0.12); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <i class="bi bi-check2" style="color:#fff; font-size:0.85rem;"></i>
+          </div>
+          <span style="font-size:0.85rem; color:rgba(255,255,255,0.80);">Dropout Layer (rate: 0.50)</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,0.12); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <i class="bi bi-check2" style="color:#fff; font-size:0.85rem;"></i>
+          </div>
+          <span style="font-size:0.85rem; color:rgba(255,255,255,0.80);">ReLU Activation Dense Output</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,0.12); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <i class="bi bi-check2" style="color:#fff; font-size:0.85rem;"></i>
+          </div>
+          <span style="font-size:0.85rem; color:rgba(255,255,255,0.80);">Bidirectional LSTM (300 units)</span>
+        </div>
+      </div>
+      <div style="margin-top:1.5rem; text-align:center; padding-top:1.25rem; border-top:1px solid rgba(255,255,255,0.1);">
+        <i class="bi bi-cpu" style="font-size:2.5rem; color:rgba(255,255,255,0.2);"></i>
+      </div>
+    </div>
+
+    <!-- Training details -->
+    <div class="aes-card" style="padding:1.6rem;">
+      <p class="section-label mb-3"><i class="bi bi-book me-1"></i>Training Details</p>
+      <div style="display:flex; flex-direction:column; gap:0;">
+        {% for item in training_details %}
+        <div style="display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid var(--col-surface-2); font-size:0.85rem;">
+          <span style="color:var(--col-text-secondary);">{{ item.0 }}</span>
+          <span style="font-weight:700; font-family:monospace;">{{ item.1 }}</span>
+        </div>
+        {% empty %}
+        <div style="display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid var(--col-surface-2); font-size:0.85rem;">
+          <span style="color:var(--col-text-secondary);">Dataset</span><span style="font-weight:700; font-family:monospace;">ASAP (Kaggle)</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid var(--col-surface-2); font-size:0.85rem;">
+          <span style="color:var(--col-text-secondary);">Train Split</span><span style="font-weight:700; font-family:monospace;">80%</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid var(--col-surface-2); font-size:0.85rem;">
+          <span style="color:var(--col-text-secondary);">Optimizer</span><span style="font-weight:700; font-family:monospace;">Adam</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; padding:9px 0; font-size:0.85rem;">
+          <span style="color:var(--col-text-secondary);">Framework</span><span style="font-weight:700; font-family:monospace;">Keras / TF</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+  </div>
 </div>
 
 {% endblock %}

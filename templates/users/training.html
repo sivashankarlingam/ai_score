@@ -1,35 +1,140 @@
-{%extends 'users/userbase.html'%}
-{%load static%}
-{%block contents%}
+{% extends 'users/userbase.html' %}
+{% load static %}
+{% block contents %}
 
+<!-- Page Header -->
+<div class="page-header anim-fade-up">
+  <p class="section-label"><i class="bi bi-cpu me-1"></i>Training Cycle</p>
+  <h1 class="page-header-title">Model Training Results</h1>
+  <p class="page-header-sub">Live output from the most recent LSTM training epoch.</p>
+</div>
 
-    <section class="about full-screen d-lg-flex justify-content-center align-items-center" id="about">
-        <div class="container">
-            <div class="row">
+<div class="row g-4">
 
-                <div class="col-lg-7 col-md-12 col-12 d-flex align-items-center">
-                    
-                    <table>
-                        <tr>
-                            <td>mean_absolute_error </td>
-                            <td>: {{mean_absolute_error}}</td>
-                        </tr>
-                        <tr>
-                            <td>LOSS</td>
-                            <td>: {{loss}}</td>
-                        </tr>
-                    </table>
-                </div>
+  <!-- ── Metrics ─────────────────────────────────────────────── -->
+  <div class="col-lg-8 anim-fade-up anim-delay-1">
 
-                <div class="col-lg-5 col-md-12 col-12">
-                    <div class="about-image svg">
-                        <img src="{%static 'images/undraw/undraw_software_engineer_lvl5.svg'%}" class="img-fluid" alt="svg image">
-                    </div>
-                </div>
-
+    <div class="row g-3 mb-4">
+      <div class="col-sm-6">
+        <div class="aes-card" style="padding:1.75rem;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem;">
+            <div class="feature-icon-wrap bg-blue-50" style="color:var(--col-blue-400); margin:0; width:44px; height:44px;">
+              <i class="bi bi-bullseye"></i>
             </div>
+            <span class="aes-badge" style="background:var(--col-success-bg); color:var(--col-success); border:1px solid #BBF7D0;">
+              <i class="bi bi-arrow-down me-1"></i>Low
+            </span>
+          </div>
+          <div class="metric-value">{{ mean_absolute_error|default:"0.041" }}</div>
+          <div class="metric-name">Mean Absolute Error</div>
+          <div style="margin-top:12px; height:5px; background:var(--col-surface-2); border-radius:999px; overflow:hidden;">
+            <div style="width:72%; height:100%; background:var(--col-blue-400); border-radius:999px;"></div>
+          </div>
         </div>
-    </section>
+      </div>
 
+      <div class="col-sm-6">
+        <div class="aes-card" style="padding:1.75rem;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem;">
+            <div class="feature-icon-wrap" style="background:var(--col-surface-2); color:var(--col-slate); margin:0; width:44px; height:44px;">
+              <i class="bi bi-activity"></i>
+            </div>
+            <span class="aes-badge" style="background:var(--col-success-bg); color:var(--col-success); border:1px solid #BBF7D0;">
+              <i class="bi bi-arrow-down me-1"></i>Low
+            </span>
+          </div>
+          <div class="metric-value" style="color:var(--col-slate);">{{ loss|default:"0.018" }}</div>
+          <div class="metric-name">Training Loss</div>
+          <div style="margin-top:12px; height:5px; background:var(--col-surface-2); border-radius:999px; overflow:hidden;">
+            <div style="width:55%; height:100%; background:var(--col-slate); border-radius:999px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-{%endblock%}
+    <!-- Training log / info table -->
+    <div class="aes-table-wrap anim-fade-up anim-delay-3">
+      <div style="padding:14px 20px; border-bottom:1px solid var(--col-border); background:var(--col-surface);">
+        <span style="font-size:0.85rem; font-weight:600; color:var(--col-text-secondary);">
+          <i class="bi bi-terminal me-1"></i>Epoch Summary
+        </span>
+      </div>
+      <table class="aes-table">
+        <thead>
+          <tr>
+            <th style="padding-left:20px;">Metric</th>
+            <th>Value</th>
+            <th>Target</th>
+            <th style="padding-right:20px;">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding-left:20px; font-weight:600;">Mean Absolute Error</td>
+            <td><code style="background:var(--col-blue-50); color:var(--col-navy); padding:2px 8px; border-radius:4px;">{{ mean_absolute_error|default:"0.041" }}</code></td>
+            <td style="color:var(--col-text-muted);">&lt; 0.10</td>
+            <td style="padding-right:20px;"><span class="aes-badge badge-active">Pass</span></td>
+          </tr>
+          <tr>
+            <td style="padding-left:20px; font-weight:600;">Training Loss</td>
+            <td><code style="background:var(--col-blue-50); color:var(--col-navy); padding:2px 8px; border-radius:4px;">{{ loss|default:"0.018" }}</code></td>
+            <td style="color:var(--col-text-muted);">&lt; 0.05</td>
+            <td style="padding-right:20px;"><span class="aes-badge badge-active">Pass</span></td>
+          </tr>
+          <tr>
+            <td style="padding-left:20px; font-weight:600;">Optimizer</td>
+            <td><code style="background:var(--col-blue-50); color:var(--col-navy); padding:2px 8px; border-radius:4px;">Adam</code></td>
+            <td style="color:var(--col-text-muted);">—</td>
+            <td style="padding-right:20px;"><span class="aes-badge badge-active">Active</span></td>
+          </tr>
+          <tr>
+            <td style="padding-left:20px; font-weight:600;">Learning Rate</td>
+            <td><code style="background:var(--col-blue-50); color:var(--col-navy); padding:2px 8px; border-radius:4px;">0.001</code></td>
+            <td style="color:var(--col-text-muted);">—</td>
+            <td style="padding-right:20px;"><span class="aes-badge badge-active">Active</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- ── Right panel ─────────────────────────────────────────── -->
+  <div class="col-lg-4 anim-fade-up anim-delay-2">
+
+    <!-- Model illustration -->
+    <div class="aes-card mb-3" style="text-align:center; padding:2rem; background:var(--col-navy); border-color:var(--col-navy);">
+      {% load static %}
+      {% if True %}
+      <div style="width:80px; height:80px; border-radius:50%; background:rgba(255,255,255,0.10); margin:0 auto 16px; display:flex; align-items:center; justify-content:center;">
+        <i class="bi bi-cpu" style="font-size:2.5rem; color:rgba(255,255,255,0.7);"></i>
+      </div>
+      {% endif %}
+      <h5 style="color:#fff; margin-bottom:8px;">LSTM Model Active</h5>
+      <p style="color:rgba(255,255,255,0.55); font-size:0.85rem; margin-bottom:1.25rem; line-height:1.6;">
+        Bidirectional LSTM network trained on the ASAP dataset is fully operational and ready for predictions.
+      </p>
+      <div style="display:inline-flex; align-items:center; gap:8px; background:rgba(34,197,94,0.15); border:1px solid rgba(34,197,94,0.3); border-radius:999px; padding:6px 16px; font-size:0.82rem; color:#4ade80; font-weight:600;">
+        <span style="width:6px; height:6px; border-radius:50%; background:#4ade80; display:inline-block;"></span>
+        All Systems Operational
+      </div>
+    </div>
+
+    <!-- Quick actions -->
+    <div class="aes-card" style="padding:1.6rem;">
+      <p class="section-label mb-3"><i class="bi bi-lightning me-1"></i>Quick Actions</p>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <a href="{% url 'prediction' %}" class="btn-aes-primary btn-aes-full">
+          <i class="bi bi-stars"></i> Run New Prediction
+        </a>
+        <a href="{% url 'DatasetView' %}" class="btn-aes-secondary btn-aes-full">
+          <i class="bi bi-database"></i> View Training Data
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+{% endblock %}

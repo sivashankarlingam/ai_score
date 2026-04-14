@@ -79,20 +79,39 @@
           </td>
 
           <td style="text-align:right; padding-right:24px;">
-            {% if i.status == 'waiting' %}
-              <a href="/ActivaUsers/?uid={{ i.id }}"
-                 class="btn-aes-primary"
-                 style="font-size:0.8rem; padding:7px 16px;">
-                <i class="bi bi-person-check-fill"></i>
-                Activate
+            <div style="display:flex; align-items:center; justify-content:flex-end; gap:6px;">
+              {% if i.status == 'waiting' %}
+                <a href="/ActivaUsers/?uid={{ i.id }}"
+                   class="btn-aes-primary"
+                   style="font-size:0.78rem; padding:6px 13px; gap:5px;">
+                  <i class="bi bi-person-check-fill"></i>
+                  Activate
+                </a>
+              {% else %}
+                <span class="btn-aes-secondary"
+                      style="font-size:0.78rem; padding:6px 13px; opacity:0.6; cursor:default; gap:5px;">
+                  <i class="bi bi-check-lg"></i>
+                  Verified
+                </span>
+              {% endif %}
+
+              <a href="{% url 'EditUsers' %}?uid={{ i.id }}"
+                 class="btn-aes-outline"
+                 style="font-size:0.78rem; padding:6px 13px; gap:5px;"
+                 title="Edit User">
+                <i class="bi bi-pencil-fill"></i>
+                Edit
               </a>
-            {% else %}
-              <span class="btn-aes-secondary"
-                    style="font-size:0.8rem; padding:7px 16px; opacity:0.6; cursor:default;">
-                <i class="bi bi-check-lg"></i>
-                Verified
-              </span>
-            {% endif %}
+
+              <a href="/DeleteUsers/?uid={{ i.id }}"
+                 class="btn-aes-outline"
+                 style="font-size:0.78rem; padding:6px 13px; gap:5px; color:var(--col-danger); border-color:var(--col-danger);"
+                 title="Delete User"
+                 onclick="return confirm('Are you sure you want to delete this user?');">
+                <i class="bi bi-trash3-fill"></i>
+                Delete
+              </a>
+            </div>
           </td>
         </tr>
         {% empty %}

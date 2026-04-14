@@ -1,69 +1,132 @@
 {% extends 'users/userbase.html' %}
 {% block contents %}
 
-<div class="dashboard-header animate__animated animate__fadeIn">
-    <h2 class="welcome-text">Hi, {{ request.session.loggeduser }}! 👋</h2>
-    <p class="text-muted">Welcome back to your essay scoring dashboard. What would you like to do today?</p>
+<!-- Page Header -->
+<div class="page-header anim-fade-up">
+  <p class="section-label"><i class="bi bi-house me-1"></i>Dashboard</p>
+  <h1 class="page-header-title">Hi, {{ request.session.loggeduser }}! 👋</h1>
+  <p class="page-header-sub">Welcome back to your essay scoring dashboard. What would you like to do today?</p>
 </div>
 
-<div class="row g-4 mb-5 animate__animated animate__fadeInUp">
-    <div class="col-md-6">
-        <div class="modern-card h-100 border-start border-4 border-primary">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div class="p-3 bg-primary bg-opacity-10 rounded-3">
-                    <i class="bi bi-pencil-square fs-3 text-primary"></i>
-                </div>
-                <span class="badge bg-primary rounded-pill">Analyze Now</span>
-            </div>
-            <h4 class="fw-bold">Score New Essay</h4>
-            <p class="text-muted">Use our high-precision LSTM model to evaluate your essay. Supports direct text entry, image uploads (OCR), and voice recording.</p>
-            <a href="{% url 'prediction' %}" class="btn btn-action mt-auto d-inline-flex align-items-center gap-2">
-                Start Analysis <i class="bi bi-arrow-right"></i>
-            </a>
+<!-- ── Primary Action + Quick Links ──────────────────────────── -->
+<div class="row g-3 mb-4">
+
+  <!-- Score Essay — hero card -->
+  <div class="col-lg-6 anim-fade-up anim-delay-1">
+    <div class="aes-card h-100" style="background:var(--col-navy); border-color:var(--col-navy);">
+      <div style="display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:1.25rem;">
+        <div style="width:50px; height:50px; border-radius:var(--radius-sm); background:rgba(255,255,255,0.12); display:flex; align-items:center; justify-content:center; font-size:1.4rem; color:#fff;">
+          <i class="bi bi-stars"></i>
         </div>
+        <span class="aes-badge" style="background:rgba(255,255,255,0.15); color:rgba(255,255,255,0.9); border:none;">
+          <i class="bi bi-lightning-charge me-1"></i>AI-Powered
+        </span>
+      </div>
+      <h3 style="color:#fff; font-size:1.35rem; margin-bottom:8px;">Score New Essay</h3>
+      <p style="color:rgba(255,255,255,0.65); font-size:0.9rem; line-height:1.7; margin-bottom:1.5rem;">
+        Evaluate your writing using our LSTM model. Supports direct text entry,
+        handwritten image uploads (OCR), and voice dictation.
+      </p>
+      <a href="{% url 'prediction' %}" class="btn-aes-primary"
+         style="background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.25);">
+        <i class="bi bi-arrow-right-circle"></i> Start Analysis
+      </a>
     </div>
-    <div class="col-md-3">
-        <div class="modern-card h-100">
-            <div class="mb-4">
-                <i class="bi bi-journal-text fs-3 text-success"></i>
-            </div>
-            <h5 class="fw-bold">Training Data</h5>
-            <p class="text-muted small">Browse the official dataset used to train our AI model.</p>
-            <a href="{% url 'DatasetView' %}" class="btn btn-outline-secondary btn-sm w-100">View Dataset</a>
-        </div>
+  </div>
+
+  <!-- Training Data -->
+  <div class="col-lg-3 col-sm-6 anim-fade-up anim-delay-2">
+    <div class="aes-card h-100" style="padding:1.6rem;">
+      <div class="feature-icon-wrap" style="background:var(--col-success-bg); color:var(--col-success);">
+        <i class="bi bi-journal-text"></i>
+      </div>
+      <h6 style="font-weight:700; margin-bottom:6px;">Training Data</h6>
+      <p style="font-size:0.83rem; color:var(--col-text-secondary); margin-bottom:1.25rem;">
+        Browse the official ASAP dataset used to train our AI model.
+      </p>
+      <a href="{% url 'DatasetView' %}" class="btn-aes-secondary" style="font-size:0.82rem; padding:7px 14px; width:100%; justify-content:center;">
+        View Dataset
+      </a>
     </div>
-    <div class="col-md-3">
-        <div class="modern-card h-100">
-            <div class="mb-4">
-                <i class="bi bi-cpu-fill fs-3 text-warning"></i>
-            </div>
-            <h5 class="fw-bold">Model Performance</h5>
-            <p class="text-muted small">Check the latest regression metrics for our training phase.</p>
-            <a href="{% url 'training' %}" class="btn btn-outline-secondary btn-sm w-100">View Stats</a>
-        </div>
+  </div>
+
+  <!-- Model Performance -->
+  <div class="col-lg-3 col-sm-6 anim-fade-up anim-delay-3">
+    <div class="aes-card h-100" style="padding:1.6rem;">
+      <div class="feature-icon-wrap" style="background:var(--col-warning-bg); color:var(--col-warning);">
+        <i class="bi bi-cpu-fill"></i>
+      </div>
+      <h6 style="font-weight:700; margin-bottom:6px;">Model Performance</h6>
+      <p style="font-size:0.83rem; color:var(--col-text-secondary); margin-bottom:1.25rem;">
+        Latest regression metrics from the current LSTM training cycle.
+      </p>
+      <a href="{% url 'training' %}" class="btn-aes-secondary" style="font-size:0.82rem; padding:7px 14px; width:100%; justify-content:center;">
+        View Stats
+      </a>
     </div>
+  </div>
+
 </div>
 
-<div class="modern-card animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
-    <h5 class="fw-bold mb-4">Account Information</h5>
-    <div class="row text-center">
-        <div class="col-md-3 border-end">
-            <div class="text-muted small">Status</div>
-            <div class="fw-bold text-success">Active <i class="bi bi-check-circle-fill ms-1"></i></div>
-        </div>
-        <div class="col-md-3 border-end">
-            <div class="text-muted small">Login ID</div>
-            <div class="fw-bold">{{ request.session.loginid }}</div>
-        </div>
-        <div class="col-md-3 border-end">
-            <div class="text-muted small">Current Model</div>
-            <div class="fw-bold">LSTM-v4.11</div>
-        </div>
-        <div class="col-md-3">
-            <div class="text-muted small">Accuracy Metric</div>
-            <div class="fw-bold text-primary">RMSE/MAE</div>
-        </div>
+<!-- ── Account Info ───────────────────────────────────────────── -->
+<div class="aes-card anim-fade-up anim-delay-4">
+  <p class="section-label mb-3"><i class="bi bi-person-badge me-1"></i>Account Information</p>
+  <div class="row g-0 text-center">
+
+    <div class="col-6 col-md-3" style="padding:16px 0; border-right:1px solid var(--col-border);">
+      <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--col-text-muted); margin-bottom:6px;">Status</div>
+      <div style="font-weight:700; color:var(--col-success); display:flex; align-items:center; justify-content:center; gap:5px;">
+        <span style="width:7px; height:7px; border-radius:50%; background:var(--col-success); display:inline-block;"></span>
+        Active
+      </div>
     </div>
+
+    <div class="col-6 col-md-3" style="padding:16px 0; border-right:1px solid var(--col-border);">
+      <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--col-text-muted); margin-bottom:6px;">Login ID</div>
+      <div style="font-weight:700; color:var(--col-text-primary);">
+        <code style="background:var(--col-blue-50); color:var(--col-navy); padding:2px 8px; border-radius:4px; font-size:0.85rem;">{{ request.session.loginid }}</code>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-3" style="padding:16px 0; border-right:1px solid var(--col-border);">
+      <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--col-text-muted); margin-bottom:6px;">Current Model</div>
+      <div style="font-weight:700; color:var(--col-text-primary);">LSTM-v4.11</div>
+    </div>
+
+    <div class="col-6 col-md-3" style="padding:16px 0;">
+      <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--col-text-muted); margin-bottom:6px;">Accuracy Metric</div>
+      <div style="font-weight:700; color:var(--col-blue-400);">RMSE / MAE</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── Quick Tips ─────────────────────────────────────────────── -->
+<div class="row g-3 mt-2 anim-fade-up anim-delay-4">
+  <div class="col-md-4">
+    <div style="display:flex; gap:12px; align-items:flex-start; padding:16px; background:var(--col-blue-50); border-radius:var(--radius-md); border:1px solid var(--col-blue-100);">
+      <i class="bi bi-info-circle-fill flex-shrink-0" style="color:var(--col-blue-400); margin-top:2px;"></i>
+      <span style="font-size:0.83rem; color:var(--col-text-secondary); line-height:1.6;">
+        Our model evaluates <strong>coherence, semantics, and vocabulary</strong> to produce a holistic score.
+      </span>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div style="display:flex; gap:12px; align-items:flex-start; padding:16px; background:var(--col-blue-50); border-radius:var(--radius-md); border:1px solid var(--col-blue-100);">
+      <i class="bi bi-image-fill flex-shrink-0" style="color:var(--col-blue-400); margin-top:2px;"></i>
+      <span style="font-size:0.83rem; color:var(--col-text-secondary); line-height:1.6;">
+        Upload a <strong>clear, well-lit photo</strong> of handwritten essays for best OCR accuracy.
+      </span>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div style="display:flex; gap:12px; align-items:flex-start; padding:16px; background:var(--col-blue-50); border-radius:var(--radius-md); border:1px solid var(--col-blue-100);">
+      <i class="bi bi-mic-fill flex-shrink-0" style="color:var(--col-blue-400); margin-top:2px;"></i>
+      <span style="font-size:0.83rem; color:var(--col-text-secondary); line-height:1.6;">
+        Voice dictation uses <strong>Chrome Speech Recognition</strong> — works best in Google Chrome.
+      </span>
+    </div>
+  </div>
 </div>
 
 {% endblock %}
