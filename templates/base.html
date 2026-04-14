@@ -1,0 +1,106 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AES | Automatic English Essay Scoring</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+
+  <!-- Custom Styles -->
+  <link href="{% static 'css/style.css' %}" rel="stylesheet">
+</head>
+<body>
+
+  <!-- ── Navbar ───────────────────────────────────────────── -->
+  <header>
+    <nav class="aes-navbar navbar navbar-expand-lg" id="mainNav">
+      <div class="container">
+
+        <!-- Brand -->
+        <a class="aes-brand navbar-brand" href="{% url 'index' %}">
+          <div class="aes-brand-icon">
+            <i class="bi bi-pencil-fill"></i>
+          </div>
+          AES Score
+        </a>
+
+        <!-- Toggler -->
+        <button class="navbar-toggler border-0 shadow-none" type="button"
+                data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"
+                style="color: var(--col-text-secondary); font-size: 1.4rem;">
+          <i class="bi bi-list"></i>
+        </button>
+
+        <!-- Links -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto align-items-center gap-1">
+            <li class="nav-item">
+              <a class="nav-link aes-nav-link" href="{% url 'index' %}">
+                <i class="bi bi-house me-1"></i>Home
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link aes-nav-link" href="{% url 'AdminLogin' %}">
+                <i class="bi bi-shield-lock me-1"></i>Admin
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link aes-nav-link" href="{% url 'UserLogin' %}">
+                <i class="bi bi-person me-1"></i>Sign In
+              </a>
+            </li>
+            <li class="nav-item ms-lg-2">
+              <a class="btn-aes-primary aes-nav-cta" href="{% url 'UserRegister' %}">
+                <i class="bi bi-plus-circle"></i> Register
+              </a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </nav>
+  </header>
+
+  <!-- ── Main Content ─────────────────────────────────────── -->
+  <main class="main-wrapper">
+    {% block contents %}
+    {% endblock %}
+  </main>
+
+  <!-- ── Footer ───────────────────────────────────────────── -->
+  <footer class="aes-footer">
+    <div class="container">
+      <div class="footer-inner">
+        <span class="footer-copy">
+          &copy; 2026 Automatic English Essay Scoring &mdash; Academic Excellence Platform
+        </span>
+        <span class="footer-tagline">
+          <i class="bi bi-cpu me-1"></i>Powered by LSTM Deep Learning
+        </span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Navbar scroll shadow -->
+  <script>
+    const nav = document.getElementById('mainNav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 10);
+    });
+  </script>
+
+</body>
+</html>

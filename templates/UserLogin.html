@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block contents %}
+
+<div class="auth-page-wrapper">
+  <div class="auth-card">
+
+    <!-- Header -->
+    <div class="text-center mb-4">
+      <div class="auth-icon-wrap" style="background:var(--col-blue-50);">
+        <i class="bi bi-person-fill" style="color:var(--col-navy); font-size:1.8rem;"></i>
+      </div>
+      <h2 style="font-size:1.55rem; font-weight:700; margin-bottom:5px;">Welcome back</h2>
+      <p style="font-size:0.9rem; color:var(--col-text-secondary); margin:0;">
+        Sign in to access your essay scoring dashboard
+      </p>
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+      {% for message in messages %}
+        <div class="aes-alert aes-alert-danger">
+          <i class="bi bi-exclamation-circle-fill flex-shrink-0"></i>
+          <span>{{ message }}</span>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <!-- Form -->
+    <form action="{% url 'UserLoginCheck' %}" method="POST" novalidate>
+      {% csrf_token %}
+
+      <div class="mb-4">
+        <label class="aes-label" for="loginid">Login ID</label>
+        <div class="aes-input-group">
+          <i class="bi bi-person aes-input-icon"></i>
+          <input type="text"
+                 class="aes-input"
+                 id="loginid"
+                 name="loginid"
+                 required
+                 placeholder="Enter your login ID"
+                 autocomplete="username">
+        </div>
+      </div>
+
+      <div class="mb-5">
+        <label class="aes-label" for="pswd">Password</label>
+        <div class="aes-input-group">
+          <i class="bi bi-lock aes-input-icon"></i>
+          <input type="password"
+                 class="aes-input"
+                 id="pswd"
+                 name="pswd"
+                 required
+                 placeholder="••••••••"
+                 autocomplete="current-password">
+        </div>
+      </div>
+
+      <button type="submit" class="btn-aes-primary btn-aes-full" style="font-size:0.96rem; padding:0.85rem;">
+        <i class="bi bi-box-arrow-in-right"></i>
+        Sign In
+      </button>
+    </form>
+
+    <!-- Divider -->
+    <hr class="auth-divider">
+
+    <p class="text-center" style="font-size:0.88rem; color:var(--col-text-secondary); margin:0;">
+      Don't have an account?
+      <a href="{% url 'UserRegister' %}" style="color:var(--col-navy); font-weight:600;">
+        Create one free <i class="bi bi-arrow-right"></i>
+      </a>
+    </p>
+
+  </div>
+</div>
+
+{% endblock %}

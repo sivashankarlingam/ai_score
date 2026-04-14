@@ -1,0 +1,146 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel | AES</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="{% static 'css/style.css' %}" rel="stylesheet">
+
+  <style>
+    body { overflow-x: hidden; }
+    @media (max-width: 991px) {
+      .sidebar-overlay {
+        display: none; position: fixed; inset: 0;
+        background: rgba(0,0,0,0.45); z-index: 1050;
+      }
+      .sidebar-overlay.visible { display: block; }
+    }
+  </style>
+</head>
+<body style="background:var(--col-bg); display:flex; margin:0; min-height:100vh;">
+
+  <!-- ── Sidebar ───────────────────────────────────────────── -->
+  <aside class="aes-sidebar" id="sidebar">
+
+    <!-- Brand -->
+    <div class="sidebar-brand-wrap">
+      <a href="{% url 'AdminHome' %}" class="sidebar-brand-link">
+        <div class="aes-brand-icon" style="width:38px; height:38px; font-size:1.05rem;">
+          <i class="bi bi-shield-lock-fill"></i>
+        </div>
+        <span class="sidebar-brand-name">AES Admin</span>
+      </a>
+    </div>
+
+    <!-- Nav -->
+    <nav class="sidebar-nav">
+      <p class="sidebar-section-label">Main</p>
+
+      <a href="{% url 'AdminHome' %}"
+         class="sidebar-link {% if request.resolver_match.url_name == 'AdminHome' %}active{% endif %}">
+        <i class="bi bi-speedometer2"></i>
+        <span>Dashboard</span>
+      </a>
+
+      <a href="{% url 'RegisterUsersView' %}"
+         class="sidebar-link {% if request.resolver_match.url_name == 'RegisterUsersView' %}active{% endif %}">
+        <i class="bi bi-people"></i>
+        <span>Manage Users</span>
+      </a>
+
+      <p class="sidebar-section-label" style="margin-top:16px;">System</p>
+
+      <a href="{% url 'index' %}" class="sidebar-link"
+         style="color:rgba(239,68,68,0.75);" title="Logout">
+        <i class="bi bi-box-arrow-left"></i>
+        <span>Exit to Site</span>
+      </a>
+    </nav>
+
+    <!-- Sidebar Footer -->
+    <div class="sidebar-footer-wrap">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <div style="width:34px; height:34px; border-radius:50%; background:var(--col-blue-400); display:flex; align-items:center; justify-content:center; color:#fff; font-size:0.85rem; font-weight:700;">
+          A
+        </div>
+        <div>
+          <div style="font-size:0.85rem; font-weight:600; color:#fff;">Administrator</div>
+          <div style="font-size:0.75rem; color:rgba(255,255,255,0.45);">Root Access</div>
+        </div>
+        <div style="margin-left:auto;">
+          <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#22C55E;"></span>
+        </div>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- Overlay for mobile -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+  <!-- ── Main Content ─────────────────────────────────────── -->
+  <div class="admin-main-content">
+
+    <!-- Top Bar -->
+    <header class="admin-topbar">
+      <!-- Mobile toggle -->
+      <div class="d-flex align-items-center gap-3">
+        <button class="d-lg-none border-0 bg-transparent p-1"
+                onclick="toggleSidebar()"
+                style="color:var(--col-text-secondary); font-size:1.4rem; cursor:pointer;">
+          <i class="bi bi-list"></i>
+        </button>
+
+        <!-- Breadcrumb / Page hint -->
+        <div class="aes-breadcrumb d-none d-md-flex">
+          <a href="{% url 'AdminHome' %}">Home</a>
+          <span class="aes-breadcrumb-sep">/</span>
+          <span>
+            {% if request.resolver_match.url_name == 'RegisterUsersView' %}
+              Manage Users
+            {% else %}
+              Dashboard
+            {% endif %}
+          </span>
+        </div>
+      </div>
+
+      <!-- Right: status -->
+      <div class="d-flex align-items-center gap-3">
+        <div class="d-none d-sm-block text-end">
+          <div style="font-size:0.88rem; font-weight:700; color:var(--col-text-primary);">Administrator</div>
+          <div style="font-size:0.75rem; color:var(--col-text-muted);">Control Center</div>
+        </div>
+        <div style="display:inline-flex; align-items:center; gap:6px; background:var(--col-success-bg); color:var(--col-success); padding:5px 12px; border-radius:999px; font-size:0.75rem; font-weight:700; letter-spacing:0.06em; border:1px solid #BBF7D0;">
+          <span style="width:6px; height:6px; border-radius:50%; background:currentColor; display:inline-block;"></span>
+          ONLINE
+        </div>
+      </div>
+    </header>
+
+    <!-- Page Body -->
+    <div class="admin-body-area">
+      {% block contents %}
+      {% endblock %}
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('open');
+      document.getElementById('sidebarOverlay').classList.toggle('visible');
+    }
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('sidebarOverlay').classList.remove('visible');
+    }
+  </script>
+</body>
+</html>

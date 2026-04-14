@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% block contents %}
+
+<!-- ── Hero ──────────────────────────────────────────────────── -->
+<section class="aes-hero">
+  <div class="container">
+    <div class="row align-items-center g-5">
+
+      <!-- Left: copy -->
+      <div class="col-lg-6 anim-fade-up">
+        <p class="section-label mb-3">
+          <i class="bi bi-stars me-1"></i>LSTM-Powered Evaluation
+        </p>
+        <h1 class="aes-hero-title">
+          Elevate Your<br><span>Essay Scoring</span><br>with AI
+        </h1>
+        <p class="aes-hero-subtitle">
+          Experience the future of automated English essay evaluation. Our advanced
+          LSTM model delivers precise, consistent, and lightning-fast academic scoring.
+        </p>
+        <div class="d-flex flex-wrap gap-3">
+          <a href="{% url 'UserLogin' %}" class="btn-aes-primary">
+            <i class="bi bi-rocket-takeoff"></i> Get Started
+          </a>
+          <a href="{% url 'AdminLogin' %}" class="btn-aes-outline">
+            <i class="bi bi-shield-lock"></i> Staff Portal
+          </a>
+        </div>
+
+        <!-- Trust indicators -->
+        <div class="d-flex flex-wrap gap-4 mt-4 pt-2">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-check-circle-fill text-blue fs-5"></i>
+            <span style="font-size:0.85rem; color:var(--col-text-secondary);">OCR Image Upload</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-check-circle-fill text-blue fs-5"></i>
+            <span style="font-size:0.85rem; color:var(--col-text-secondary);">Instant Results</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-check-circle-fill text-blue fs-5"></i>
+            <span style="font-size:0.85rem; color:var(--col-text-secondary);">Academic Grade</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: feature cards grid -->
+      <div class="col-lg-6 anim-fade-up anim-delay-2">
+        <div class="row g-3">
+
+          <div class="col-6">
+            <div class="aes-card h-100" style="padding:1.5rem;">
+              <div class="feature-icon-wrap bg-blue-50" style="color:var(--col-blue-400);">
+                <i class="bi bi-cpu"></i>
+              </div>
+              <h6 style="font-weight:700; margin-bottom:6px;">AI Extraction</h6>
+              <p style="font-size:0.85rem; color:var(--col-text-secondary); margin:0;">
+                Automatic text extraction from handwritten images via OCR.
+              </p>
+            </div>
+          </div>
+
+          <div class="col-6">
+            <div class="aes-card h-100" style="padding:1.5rem; background:var(--col-navy); border-color:var(--col-navy);">
+              <div class="feature-icon-wrap" style="background:rgba(255,255,255,0.12); color:#fff; width:50px; height:50px;">
+                <i class="bi bi-graph-up-arrow"></i>
+              </div>
+              <h6 style="font-weight:700; margin-bottom:6px; color:#fff;">Deep Learning</h6>
+              <p style="font-size:0.85rem; color:rgba(255,255,255,0.65); margin:0;">
+                LSTM networks for deep semantic understanding.
+              </p>
+            </div>
+          </div>
+
+          <div class="col-6">
+            <div class="aes-card h-100" style="padding:1.5rem;">
+              <div class="feature-icon-wrap" style="background:var(--col-success-bg); color:var(--col-success);">
+                <i class="bi bi-lightning-charge"></i>
+              </div>
+              <h6 style="font-weight:700; margin-bottom:6px;">Real-time</h6>
+              <p style="font-size:0.85rem; color:var(--col-text-secondary); margin:0;">
+                Get essay scores and detailed analysis in seconds.
+              </p>
+            </div>
+          </div>
+
+          <div class="col-6">
+            <div class="aes-card h-100" style="padding:1.5rem; background:var(--col-blue-50); border-color:var(--col-blue-100);">
+              <div class="feature-icon-wrap" style="background:var(--col-blue-100); color:var(--col-navy);">
+                <i class="bi bi-bar-chart-line"></i>
+              </div>
+              <h6 style="font-weight:700; margin-bottom:6px;">Metrics</h6>
+              <p style="font-size:0.85rem; color:var(--col-text-secondary); margin:0;">
+                MSE, RMSE scores with full model performance stats.
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── Stats Strip ────────────────────────────────────────────── -->
+<section style="background:var(--col-surface); border-top:1px solid var(--col-border); border-bottom:1px solid var(--col-border); padding:40px 0;">
+  <div class="container">
+    <div class="row text-center g-4">
+      <div class="col-6 col-md-3">
+        <div style="font-family:var(--font-display); font-size:2rem; font-weight:700; color:var(--col-navy);">12K+</div>
+        <div style="font-size:0.82rem; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--col-text-muted);">Essays Scored</div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div style="font-family:var(--font-display); font-size:2rem; font-weight:700; color:var(--col-navy);">1.2s</div>
+        <div style="font-size:0.82rem; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--col-text-muted);">Avg. Inference</div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div style="font-family:var(--font-display); font-size:2rem; font-weight:700; color:var(--col-navy);">98%</div>
+        <div style="font-size:0.82rem; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--col-text-muted);">Model Uptime</div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div style="font-family:var(--font-display); font-size:2rem; font-weight:700; color:var(--col-navy);">8</div>
+        <div style="font-size:0.82rem; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--col-text-muted);">Essay Categories</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA ────────────────────────────────────────────────────── -->
+<section style="padding:80px 0; background:var(--col-bg);">
+  <div class="container text-center">
+    <div class="anim-fade-up" style="max-width:560px; margin:0 auto;">
+      <p class="section-label"><i class="bi bi-mortarboard me-1"></i>For Students & Educators</p>
+      <h2 style="font-family:var(--font-display); font-size:2rem; margin-bottom:1rem;">
+        Ready to score your first essay?
+      </h2>
+      <p style="color:var(--col-text-secondary); margin-bottom:2rem;">
+        Create your free account in under a minute and start uploading essays for AI-powered scoring immediately.
+      </p>
+      <a href="{% url 'UserRegister' %}" class="btn-aes-primary" style="font-size:1rem; padding:0.9rem 2.4rem;">
+        <i class="bi bi-person-plus"></i> Create Free Account
+      </a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

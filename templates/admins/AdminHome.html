@@ -1,0 +1,147 @@
+{% extends 'admins/adminbase.html' %}
+{% block contents %}
+
+<!-- Page Header -->
+<div class="page-header anim-fade-up">
+  <p class="section-label"><i class="bi bi-speedometer2 me-1"></i>Overview</p>
+  <h1 class="page-header-title">Admin Dashboard</h1>
+  <p class="page-header-sub">System health, model status, and user activity at a glance.</p>
+</div>
+
+<!-- Stat Cards -->
+<div class="row g-3 mb-4">
+
+  <div class="col-6 col-xl-3 anim-fade-up anim-delay-1">
+    <div class="stat-card">
+      <div class="stat-accent" style="background:var(--col-blue-400);"></div>
+      <div style="color:var(--col-blue-400); font-size:1.4rem; margin-bottom:10px;">
+        <i class="bi bi-activity"></i>
+      </div>
+      <div class="stat-number" style="color:var(--col-blue-400);">98%</div>
+      <div class="stat-label">Model Uptime</div>
+    </div>
+  </div>
+
+  <div class="col-6 col-xl-3 anim-fade-up anim-delay-2">
+    <div class="stat-card">
+      <div class="stat-accent" style="background:var(--col-success);"></div>
+      <div style="color:var(--col-success); font-size:1.4rem; margin-bottom:10px;">
+        <i class="bi bi-lightning-charge"></i>
+      </div>
+      <div class="stat-number" style="color:var(--col-success);">1.2s</div>
+      <div class="stat-label">Avg. Inference</div>
+    </div>
+  </div>
+
+  <div class="col-6 col-xl-3 anim-fade-up anim-delay-3">
+    <div class="stat-card">
+      <div class="stat-accent" style="background:var(--col-navy);"></div>
+      <div style="color:var(--col-navy); font-size:1.4rem; margin-bottom:10px;">
+        <i class="bi bi-file-text"></i>
+      </div>
+      <div class="stat-number" style="color:var(--col-navy);">12K</div>
+      <div class="stat-label">Total Essays</div>
+    </div>
+  </div>
+
+  <div class="col-6 col-xl-3 anim-fade-up anim-delay-4">
+    <div class="stat-card">
+      <div class="stat-accent" style="background:var(--col-warning);"></div>
+      <div style="color:var(--col-warning); font-size:1.4rem; margin-bottom:10px;">
+        <i class="bi bi-person-exclamation"></i>
+      </div>
+      <div class="stat-number" style="color:var(--col-warning);">24</div>
+      <div class="stat-label">Pending Users</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- System Status Panel -->
+<div class="row g-4 mt-1">
+
+  <div class="col-lg-7 anim-fade-up anim-delay-2">
+    <div class="aes-card" style="background:var(--col-navy); border-color:var(--col-navy); height:100%;">
+      <div class="d-flex align-items-start gap-4">
+        <div style="flex:1;">
+          <p class="section-label" style="color:rgba(255,255,255,0.45);">
+            <i class="bi bi-cpu me-1"></i>System Node
+          </p>
+          <h3 style="color:#fff; font-size:1.5rem; margin-bottom:10px;">
+            Neural Network Status
+          </h3>
+          <p style="color:rgba(255,255,255,0.65); font-size:0.92rem; margin-bottom:1.5rem; line-height:1.7;">
+            All LSTM inference nodes are reporting healthy status.
+            Model accuracy and response latency are within acceptable bounds.
+          </p>
+          <div class="d-flex gap-3 flex-wrap">
+            <a href="{% url 'RegisterUsersView' %}"
+               class="btn-aes-primary"
+               style="background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.25); backdrop-filter:blur(4px);">
+              <i class="bi bi-people"></i>
+              Manage Users
+            </a>
+            <span style="display:inline-flex; align-items:center; gap:7px; padding:8px 16px; background:rgba(34,197,94,0.15); border:1.5px solid rgba(34,197,94,0.3); border-radius:var(--radius-sm); color:#4ade80; font-size:0.83rem; font-weight:600;">
+              <span style="width:7px; height:7px; border-radius:50%; background:#4ade80; display:inline-block;"></span>
+              All Systems Operational
+            </span>
+          </div>
+        </div>
+        <div class="d-none d-md-flex align-items-center justify-content-center"
+             style="width:90px; height:90px; border-radius:50%; background:rgba(255,255,255,0.07); flex-shrink:0;">
+          <i class="bi bi-shield-check" style="font-size:2.5rem; color:rgba(255,255,255,0.8);"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-5 anim-fade-up anim-delay-3">
+    <div class="aes-card h-100">
+      <p class="section-label mb-3"><i class="bi bi-bar-chart me-1"></i>Quick Stats</p>
+
+      <!-- Uptime bar -->
+      <div class="mb-3">
+        <div class="d-flex justify-content-between mb-1" style="font-size:0.82rem;">
+          <span style="font-weight:600; color:var(--col-text-secondary);">Model Uptime</span>
+          <span style="font-weight:700; color:var(--col-blue-400);">98%</span>
+        </div>
+        <div style="height:6px; background:var(--col-surface-2); border-radius:999px; overflow:hidden;">
+          <div style="width:98%; height:100%; background:var(--col-blue-400); border-radius:999px;"></div>
+        </div>
+      </div>
+
+      <!-- Accuracy bar -->
+      <div class="mb-3">
+        <div class="d-flex justify-content-between mb-1" style="font-size:0.82rem;">
+          <span style="font-weight:600; color:var(--col-text-secondary);">Prediction Accuracy</span>
+          <span style="font-weight:700; color:var(--col-success);">91%</span>
+        </div>
+        <div style="height:6px; background:var(--col-surface-2); border-radius:999px; overflow:hidden;">
+          <div style="width:91%; height:100%; background:var(--col-success); border-radius:999px;"></div>
+        </div>
+      </div>
+
+      <!-- Active users bar -->
+      <div>
+        <div class="d-flex justify-content-between mb-1" style="font-size:0.82rem;">
+          <span style="font-weight:600; color:var(--col-text-secondary);">User Activation Rate</span>
+          <span style="font-weight:700; color:var(--col-navy);">76%</span>
+        </div>
+        <div style="height:6px; background:var(--col-surface-2); border-radius:999px; overflow:hidden;">
+          <div style="width:76%; height:100%; background:var(--col-navy); border-radius:999px;"></div>
+        </div>
+      </div>
+
+      <hr style="border-color:var(--col-border); margin:1.25rem 0;">
+
+      <a href="{% url 'RegisterUsersView' %}" class="btn-aes-secondary btn-aes-full">
+        <i class="bi bi-person-check"></i>
+        Authorise Pending Users
+        <span class="ms-auto aes-badge badge-waiting">24</span>
+      </a>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

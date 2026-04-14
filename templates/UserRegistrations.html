@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block contents %}
+
+<div class="auth-page-wrapper" style="align-items:flex-start; padding:50px 16px;">
+  <div class="auth-card auth-card-wide" style="max-width:680px;">
+
+    <!-- Header -->
+    <div class="text-center mb-5">
+      <div class="auth-icon-wrap"
+           style="background:var(--col-success-bg); width:64px; height:64px;">
+        <i class="bi bi-person-plus-fill" style="color:var(--col-success); font-size:1.8rem;"></i>
+      </div>
+      <p class="section-label" style="display:flex; justify-content:center; margin-bottom:4px;">
+        <i class="bi bi-mortarboard me-1"></i>Student Registration
+      </p>
+      <h2 style="font-size:1.55rem; font-weight:700; margin-bottom:5px;">Create your account</h2>
+      <p style="font-size:0.9rem; color:var(--col-text-secondary); margin:0;">
+        Join the most advanced essay scoring platform for academic excellence
+      </p>
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+      {% for message in messages %}
+        <div class="aes-alert {% if 'success' in message.tags %}aes-alert-success{% else %}aes-alert-danger{% endif %}">
+          <i class="bi {% if 'success' in message.tags %}bi-check-circle-fill{% else %}bi-exclamation-circle-fill{% endif %} flex-shrink-0"></i>
+          <span>{{ message }}</span>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <!-- Form -->
+    <form action="{% url 'UserRegisterActions' %}" method="POST" novalidate>
+      {% csrf_token %}
+
+      <!-- Section: Identity -->
+      <p class="section-label mb-3">
+        <i class="bi bi-person-vcard me-1"></i>Personal Information
+      </p>
+
+      <div class="row g-3 mb-2">
+        <div class="col-md-6">
+          <label class="aes-label" for="id_name">Full Name</label>
+          {{ form.name }}
+          <p class="form-hint">Letters only — no numbers or symbols</p>
+        </div>
+        <div class="col-md-6">
+          <label class="aes-label" for="id_loginid">Login ID</label>
+          {{ form.loginid }}
+          <p class="form-hint">Unique username for sign-in</p>
+        </div>
+      </div>
+
+      <div class="row g-3 mb-2">
+        <div class="col-md-6">
+          <label class="aes-label" for="id_email">Email Address</label>
+          {{ form.email }}
+        </div>
+        <div class="col-md-6">
+          <label class="aes-label" for="id_mobile">Mobile Number</label>
+          {{ form.mobile }}
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label class="aes-label" for="id_password">Password</label>
+        {{ form.password }}
+        <p class="form-hint">Min 8 chars · 1 uppercase · 1 lowercase · 1 number</p>
+      </div>
+
+      <!-- Section: Address -->
+      <hr class="auth-divider" style="margin:1.5rem 0;">
+      <p class="section-label mb-3">
+        <i class="bi bi-geo-alt me-1"></i>Location Details
+      </p>
+
+      <div class="row g-3 mb-2">
+        <div class="col-md-6">
+          <label class="aes-label" for="id_city">City</label>
+          {{ form.city }}
+        </div>
+        <div class="col-md-6">
+          <label class="aes-label" for="id_state">State</label>
+          {{ form.state }}
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="aes-label" for="id_locality">Locality</label>
+        {{ form.locality }}
+      </div>
+
+      <div class="mb-4">
+        <label class="aes-label" for="id_address">Detailed Address</label>
+        {{ form.address }}
+      </div>
+
+      <!-- Hidden status -->
+      {{ form.status }}
+
+      <!-- Submit -->
+      <button type="submit"
+              class="btn-aes-primary btn-aes-full"
+              style="font-size:0.96rem; padding:0.9rem;">
+        <i class="bi bi-person-check"></i>
+        Create Official Account
+      </button>
+    </form>
+
+    <!-- Sign-in link -->
+    <hr class="auth-divider">
+    <p class="text-center" style="font-size:0.88rem; color:var(--col-text-secondary); margin:0;">
+      Already have an account?
+      <a href="{% url 'UserLogin' %}" style="color:var(--col-navy); font-weight:600;">
+        Sign in <i class="bi bi-arrow-right"></i>
+      </a>
+    </p>
+
+  </div>
+</div>
+
+<!-- Scoped form widget styles -->
+<style>
+  /* Style Django-rendered form fields to match AES design system */
+  .auth-card form input[type="text"],
+  .auth-card form input[type="password"],
+  .auth-card form input[type="email"],
+  .auth-card form input[type="tel"],
+  .auth-card form textarea,
+  .auth-card form select {
+    width: 100%;
+    padding: 0.72rem 1rem;
+    font-family: var(--font-body);
+    font-size: 0.93rem;
+    color: var(--col-text-primary);
+    background: var(--col-bg);
+    border: 1.5px solid var(--col-border);
+    border-radius: var(--radius-sm);
+    outline: none;
+    transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+    -webkit-appearance: none;
+    appearance: none;
+    line-height: 1.5;
+  }
+
+  .auth-card form input:focus,
+  .auth-card form textarea:focus,
+  .auth-card form select:focus {
+    border-color: var(--col-blue-400);
+    background: var(--col-surface);
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.18);
+  }
+
+  .auth-card form input::placeholder,
+  .auth-card form textarea::placeholder {
+    color: var(--col-text-muted);
+  }
+
+  .auth-card form textarea {
+    min-height: 90px;
+    resize: vertical;
+  }
+</style>
+
+{% endblock %}

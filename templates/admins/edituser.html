@@ -1,0 +1,58 @@
+{% extends 'admins/adminbase.html' %}
+{% block contents %}
+
+<div class="dashboard-header animate__animated animate__fadeIn mb-4">
+    <h2 class="welcome-text">Edit User: {{ user.name }}</h2>
+    <p class="text-muted">Update administrative details for the student.</p>
+</div>
+
+<div class="modern-card animate__animated animate__fadeInUp border-0 shadow-sm col-md-8">
+    <form method="POST" action="{% url 'EditUsers' %}">
+        {% csrf_token %}
+        <input type="hidden" name="uid" value="{{ user.id }}">
+        
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label for="name" class="form-label fw-bold">Student Name</label>
+                <input type="text" class="form-control bg-light border-0" id="name" name="name" value="{{ user.name }}" required>
+            </div>
+            
+            <div class="col-md-6">
+                <label for="email" class="form-label fw-bold">Email Address</label>
+                <input type="email" class="form-control bg-light border-0" id="email" name="email" value="{{ user.email }}" required>
+            </div>
+            
+            <div class="col-md-6">
+                <label for="mobile" class="form-label fw-bold">Contact Number</label>
+                <input type="text" class="form-control bg-light border-0" id="mobile" name="mobile" value="{{ user.mobile }}" required>
+            </div>
+            
+            <div class="col-md-6">
+                <label for="locality" class="form-label fw-bold">Locality</label>
+                <input type="text" class="form-control bg-light border-0" id="locality" name="locality" value="{{ user.locality }}" required>
+            </div>
+            
+            <div class="col-md-12">
+                <label for="address" class="form-label fw-bold">Address</label>
+                <input type="text" class="form-control bg-light border-0" id="address" name="address" value="{{ user.address }}" required>
+            </div>
+            
+            <div class="col-md-6">
+                <label for="city" class="form-label fw-bold">City</label>
+                <input type="text" class="form-control bg-light border-0" id="city" name="city" value="{{ user.city }}" required>
+            </div>
+            
+            <div class="col-md-6">
+                <label for="state" class="form-label fw-bold">State</label>
+                <input type="text" class="form-control bg-light border-0" id="state" name="state" value="{{ user.state }}" required>
+            </div>
+        </div>
+        
+        <div class="mt-4 pt-3 border-top d-flex gap-2">
+            <button type="submit" class="btn btn-primary px-4 fw-bold">Update Details</button>
+            <a href="{% url 'RegisterUsersView' %}" class="btn btn-light px-4 fw-bold text-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

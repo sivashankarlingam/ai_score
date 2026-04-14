@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block contents %}
+
+<div class="auth-page-wrapper">
+  <div class="auth-card">
+
+    <!-- Header -->
+    <div class="text-center mb-4">
+      <div class="auth-icon-wrap"
+           style="background:linear-gradient(135deg, var(--col-navy) 0%, #2B4FC7 100%);">
+        <i class="bi bi-shield-lock-fill" style="color:#fff; font-size:1.8rem;"></i>
+      </div>
+      <p class="section-label" style="justify-content:center; display:flex; margin-bottom:4px;">
+        <i class="bi bi-lock me-1"></i>Restricted Access
+      </p>
+      <h2 style="font-size:1.55rem; font-weight:700; margin-bottom:5px;">Admin Portal</h2>
+      <p style="font-size:0.9rem; color:var(--col-text-secondary); margin:0;">
+        Secure access for administrative staff only
+      </p>
+    </div>
+
+    <!-- Security notice -->
+    <div class="aes-alert" style="background:var(--col-blue-50); border-color:var(--col-blue-100); color:var(--col-navy); margin-bottom:1.5rem;">
+      <i class="bi bi-info-circle-fill flex-shrink-0"></i>
+      <span style="font-size:0.83rem;">This session is monitored. Unauthorized access is prohibited.</span>
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+      {% for message in messages %}
+        <div class="aes-alert aes-alert-danger">
+          <i class="bi bi-exclamation-triangle-fill flex-shrink-0"></i>
+          <span>{{ message }}</span>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <!-- Form -->
+    <form action="{% url 'AdminLoginCheck' %}" method="POST" novalidate>
+      {% csrf_token %}
+
+      <div class="mb-4">
+        <label class="aes-label" for="loginid">Admin ID</label>
+        <div class="aes-input-group">
+          <i class="bi bi-person-badge aes-input-icon"></i>
+          <input type="text"
+                 class="aes-input"
+                 id="loginid"
+                 name="loginid"
+                 required
+                 placeholder="admin"
+                 autocomplete="username">
+        </div>
+      </div>
+
+      <div class="mb-5">
+        <label class="aes-label" for="pswd">Secure Password</label>
+        <div class="aes-input-group">
+          <i class="bi bi-key-fill aes-input-icon"></i>
+          <input type="password"
+                 class="aes-input"
+                 id="pswd"
+                 name="pswd"
+                 required
+                 placeholder="••••••••"
+                 autocomplete="current-password">
+        </div>
+      </div>
+
+      <button type="submit"
+              class="btn-aes-primary btn-aes-full"
+              style="font-size:0.96rem; padding:0.85rem; background:linear-gradient(135deg, var(--col-navy) 0%, #2B4FC7 100%);">
+        <i class="bi bi-shield-check"></i>
+        Authorize Access
+      </button>
+    </form>
+
+    <!-- Back link -->
+    <hr class="auth-divider">
+
+    <p class="text-center" style="font-size:0.88rem; color:var(--col-text-secondary); margin:0;">
+      <a href="{% url 'index' %}" style="color:var(--col-slate); font-weight:500;">
+        <i class="bi bi-arrow-left me-1"></i>Back to Main Site
+      </a>
+    </p>
+
+  </div>
+</div>
+
+{% endblock %}

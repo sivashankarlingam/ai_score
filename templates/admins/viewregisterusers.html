@@ -1,0 +1,112 @@
+{% extends 'admins/adminbase.html' %}
+{% block contents %}
+
+<!-- Page Header -->
+<div class="page-header anim-fade-up d-flex flex-wrap align-items-start justify-content-between gap-3">
+  <div>
+    <p class="section-label"><i class="bi bi-people me-1"></i>Administration</p>
+    <h1 class="page-header-title">User Management</h1>
+    <p class="page-header-sub">Review and authorize student access to the scoring platform.</p>
+  </div>
+  <!-- Quick filter (visual only — Django handles filtering server-side) -->
+  <div style="display:flex; gap:8px; flex-wrap:wrap;">
+    <span class="aes-badge badge-waiting"><i class="bi bi-hourglass-split me-1"></i>Pending</span>
+    <span class="aes-badge badge-active"><i class="bi bi-check-lg me-1"></i>Active</span>
+  </div>
+</div>
+
+<!-- Table Card -->
+<div class="aes-table-wrap anim-fade-up anim-delay-1">
+
+  <!-- Table toolbar -->
+  <div style="padding:16px 20px; border-bottom:1px solid var(--col-border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; background:var(--col-surface);">
+    <span style="font-size:0.85rem; font-weight:600; color:var(--col-text-secondary);">
+      <i class="bi bi-table me-1"></i>Registered Students
+    </span>
+    <span style="font-size:0.78rem; color:var(--col-text-muted);">
+      Total entries: {{ data|length }}
+    </span>
+  </div>
+
+  <div class="table-responsive">
+    <table class="aes-table">
+      <thead>
+        <tr>
+          <th style="padding-left:24px;">#</th>
+          <th>Student</th>
+          <th>Login ID</th>
+          <th>Contact</th>
+          <th>Locality</th>
+          <th class="text-center">Status</th>
+          <th style="text-align:right; padding-right:24px;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for i in data %}
+        <tr>
+          <td style="padding-left:24px; color:var(--col-text-muted); font-size:0.82rem; font-weight:600;">
+            {{ forloop.counter }}
+          </td>
+
+          <td>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div class="avatar-initials">{{ i.name|slice:":1"|upper }}</div>
+              <div>
+                <div style="font-weight:600; font-size:0.9rem;">{{ i.name }}</div>
+              </div>
+            </div>
+          </td>
+
+          <td>
+            <code style="background:var(--col-blue-50); color:var(--col-navy); padding:2px 8px; border-radius:4px; font-size:0.82rem;">
+              {{ i.loginid }}
+            </code>
+          </td>
+
+          <td>
+            <div style="font-size:0.85rem; font-weight:600;">{{ i.email }}</div>
+            <div style="font-size:0.8rem; color:var(--col-text-muted);">{{ i.mobile }}</div>
+          </td>
+
+          <td style="font-size:0.85rem; color:var(--col-text-secondary);">{{ i.locality }}</td>
+
+          <td class="text-center">
+            {% if i.status == 'waiting' %}
+              <span class="aes-badge badge-waiting badge-dot">Pending</span>
+            {% else %}
+              <span class="aes-badge badge-active badge-dot">Active</span>
+            {% endif %}
+          </td>
+
+          <td style="text-align:right; padding-right:24px;">
+            {% if i.status == 'waiting' %}
+              <a href="/ActivaUsers/?uid={{ i.id }}"
+                 class="btn-aes-primary"
+                 style="font-size:0.8rem; padding:7px 16px;">
+                <i class="bi bi-person-check-fill"></i>
+                Activate
+              </a>
+            {% else %}
+              <span class="btn-aes-secondary"
+                    style="font-size:0.8rem; padding:7px 16px; opacity:0.6; cursor:default;">
+                <i class="bi bi-check-lg"></i>
+                Verified
+              </span>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="7" style="padding:60px 0; text-align:center; color:var(--col-text-muted);">
+            <i class="bi bi-people" style="font-size:3rem; opacity:0.2; display:block; margin-bottom:12px;"></i>
+            <div style="font-size:0.9rem; font-weight:500;">No users registered in the system yet.</div>
+            <div style="font-size:0.82rem; margin-top:4px; opacity:0.7;">Users will appear here once they register.</div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}
