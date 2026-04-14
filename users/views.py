@@ -21,8 +21,13 @@ from sklearn.metrics import mean_squared_error
 from PIL import Image
 import pytesseract
 
-# Set path for windows
-pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+import os
+
+# Set path for windows/linux
+if os.name == 'posix':  # Linux (Hugging Face)
+    pytesseract.pytesseract.tesseract_cmd = '/usr/bin/tesseract'
+else:  # Windows (Local)
+    pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
 
 # =========================
