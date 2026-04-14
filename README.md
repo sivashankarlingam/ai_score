@@ -1,24 +1,24 @@
----
-title: AI English Essay Scoring System
-emoji: 📝
-colorFrom: blue
-colorTo: indigo
-sdk: docker
-pinned: false
-app_port: 7860
----
+# Essay Scoring System & OCR Engine
 
-# Automatic English Essay Scoring Algorithm
-
-This space hosts a Django-based web application that uses Machine Learning (LSTM & Word2Vec) to automatically score English essays. It also features handwritten essay recognition using Tesseract OCR.
+This is a comprehensive Django-based application for automatically scoring English essays using Machine Learning (LSTM & Word2Vec) and extracting text from handwritten images using Tesseract OCR.
 
 ## Features
-- **AI Scoring**: Intelligent evaluation based on pre-trained LSTM models.
-- **Handwriting OCR**: Upload images of handwritten essays for automatic text extraction.
-- **Voice-to-Text**: Dictate your essay directly in the browser (Chrome recommended).
+- **AI Scoring**: Evaluation of semantic depth and coherence.
+- **Handwriting OCR**: Image-to-text processing via Tesseract.
+- **Voice Features**: Built-in speech recognition for essay dictation.
 
-## Technical Stack
-- **Backend**: Django (Python)
-- **ML Engine**: TensorFlow, Gensim, Scikit-learn
-- **OCR Engine**: Tesseract OCR
-- **Deployment**: Dockerized on Hugging Face Spaces
+## Deployment Details (Railway.app)
+This project is configured for deployment on Railway using a **Dockerfile**.
+
+### Environment Variables
+For production, you should set these in your Railway dashboard:
+- `DEBUG`: Set to `False`
+- `SECRET_KEY`: Your production secret key
+- `DATABASE_URL`: Automatically provided if you add a PostgreSQL service
+
+### Local Setup
+1. Clone the repository.
+2. Install dependencies: `pip install -r requirements.txt`
+3. Install Tesseract OCR locally.
+4. Run migrations: `python manage.py migrate`
+5. Run server: `python manage.py runserver`

@@ -4,7 +4,8 @@ FROM python:3.9-slim
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
-ENV PORT 7860
+# Railway providing dynamic port, default to 8000 for local testing
+ENV PORT 8000
 
 # Set work directory
 WORKDIR /code
@@ -12,6 +13,7 @@ WORKDIR /code
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     tesseract-ocr \
+    tesseract-ocr-eng \
     libtesseract-dev \
     libgl1-mesa-glx \
     && apt-get clean \
@@ -21,20 +23,20 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt /code/
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Download NLTK data
+# Download NLTK data (optimized for smaller size)
 RUN python -m nltk.downloader stopwords punkt
 
 # Copy project
 COPY . /code/
 
-# Create a non-root user and switch to it
+# Run as non-root user (standard for cloud safety)
 RUN useradd -m -u 1000 user
 USER user
 ENV HOME=/home/user \
     PATH=/home/user/.local/bin:$PATH
 
-# Expose the port Hugging Face expects
-EXPOSE 7860
+# Let Docker know which port we expect (informational)
+EXPOSE 8000
 
-# Run the project using gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:7860", "Automatic_English_Essay_Scoring_Algorithm_Based_On_Ml.wsgi:application"]
+# Bind to the dynamic PORT assigned by the platform
+CMD ["sh", "-c", "gunicorn --bind 0.0.0.0:$PORT Automatic_English_Essay_Scoring_Algorithm_Based_On_Ml.wsgi:application"]
