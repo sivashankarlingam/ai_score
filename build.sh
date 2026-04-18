@@ -6,7 +6,7 @@ set -o errexit
 pip install -r requirements.txt
 
 # Download NLTK stopwords
-python -m nltk.downloader stopwords
+python -m nltk.downloader -d nltk_data stopwords
 
 # Collect static files
 python manage.py collectstatic --no-input

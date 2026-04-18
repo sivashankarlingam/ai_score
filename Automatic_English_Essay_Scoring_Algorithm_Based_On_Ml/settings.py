@@ -28,7 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-!!t7r_3hu(9m7sp6@(f5ie(u-9num2w^+vp--(gu3)pyh(lh1!')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -141,3 +141,9 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+
+# NLTK path configuration
+import nltk
+nltk_data_dir = os.path.join(BASE_DIR, 'nltk_data')
+if nltk_data_dir not in set(nltk.data.path):
+    nltk.data.path.append(nltk_data_dir)
