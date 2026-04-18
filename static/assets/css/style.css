@@ -856,15 +856,117 @@ textarea.aes-input {
 ::-webkit-scrollbar-thumb:hover { background: var(--col-blue-300); }
 
 /* ── Responsive ──────────────────────────────────────────────── */
-@media (max-width: 991px) {
-  .aes-sidebar { transform: translateX(-100%); transition: transform 0.3s ease; }
-  .aes-sidebar.open { transform: translateX(0); }
-  .admin-main-content { margin-left: 0; }
-  .admin-body-area { padding: 24px 20px; }
+
+/* Prevent any horizontal scrolling globally */
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
 }
 
+/* ── Tablet + Mobile (≤991px) ─────────────────────────────── */
+@media (max-width: 991px) {
+  /* Sidebar: slides off-canvas */
+  .aes-sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    width: 260px;
+  }
+  .aes-sidebar.open { transform: translateX(0); }
+
+  /* Content area: no left margin, full width */
+  .admin-main-content { margin-left: 0; width: 100%; }
+
+  /* Topbar: reduce horizontal padding */
+  .admin-topbar { padding: 0 16px; }
+
+  /* Body area: tighter padding */
+  .admin-body-area { padding: 20px 16px; }
+
+  /* Tables: allow horizontal scroll on small screens */
+  .aes-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .aes-table     { min-width: 540px; }
+
+  /* Navbar links stack nicely */
+  .navbar-collapse { padding: 12px 0 8px; }
+  .aes-nav-link    { padding: 10px 16px !important; }
+  .aes-nav-cta     { margin: 6px 16px 4px; display: block; text-align: center; }
+}
+
+/* ── Mobile (≤768px) ─────────────────────────────────────── */
 @media (max-width: 768px) {
-  .auth-card { padding: 2rem 1.5rem; }
-  .aes-hero  { padding: 60px 0 50px; }
-  .score-number { font-size: 3.5rem; }
+  /* Auth cards */
+  .auth-page-wrapper { padding: 24px 12px; align-items: flex-start; }
+  .auth-card         { padding: 1.75rem 1.25rem; border-radius: var(--radius-lg); }
+  .auth-card-wide    { max-width: 100%; }
+
+  /* Hero */
+  .aes-hero          { padding: 48px 0 40px; }
+  .aes-hero-title    { font-size: clamp(1.8rem, 7vw, 2.6rem); }
+  .aes-hero-subtitle { font-size: 0.95rem; }
+
+  /* Score result */
+  .score-number           { font-size: 3rem; }
+  .score-result-panel     { padding: 1.5rem; flex-direction: column !important; gap: 16px !important; }
+  .score-result-panel > * { min-width: unset !important; width: 100%; }
+
+  /* Page header */
+  .page-header-title { font-size: 1.35rem; }
+
+  /* Stat card numbers */
+  .stat-number   { font-size: 1.75rem; }
+  .metric-value  { font-size: 1.75rem; }
+
+  /* Upload zone */
+  .upload-zone   { padding: 1.75rem 1rem; }
+
+  /* Cards — reduce padding */
+  .aes-card      { padding: 1.5rem 1.25rem; }
+
+  /* Admin topbar row — stack on very small */
+  .admin-topbar  { flex-wrap: wrap; height: auto; min-height: 56px; padding: 8px 16px; gap: 8px; }
+
+  /* Footer: stack vertically */
+  .footer-inner  { flex-direction: column; align-items: center; text-align: center; gap: 6px; }
+
+  /* Ensure text never overflows container */
+  p, span, div, h1, h2, h3, h4, h5, h6, a {
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+
+  /* Buttons: full-width stacking when in flex-wrap context */
+  .d-flex.flex-wrap.gap-3 .btn-aes-primary,
+  .d-flex.flex-wrap.gap-3 .btn-aes-outline {
+    flex: 1 1 100%;
+    justify-content: center;
+  }
+
+  /* Tab buttons on predict form */
+  .tab-btn { font-size: 0.78rem !important; padding: 7px 6px !important; }
+
+  /* Breadcrumb hidden on mobile (already d-none d-md-flex via Bootstrap) */
+}
+
+/* ── Small Mobile (≤480px) ───────────────────────────────── */
+@media (max-width: 480px) {
+  /* Navbar brand text size */
+  .aes-brand { font-size: 1.1rem; }
+
+  /* Hero feature card grid: stack to single column */
+  .aes-hero .row.g-3 > .col-6 { width: 100%; }
+
+  /* Auth card: minimal padding */
+  .auth-card { padding: 1.5rem 1rem; }
+
+  /* Score result: compact number */
+  .score-number { font-size: 2.5rem; }
+
+  /* Admin body area: very tight */
+  .admin-body-area { padding: 14px 12px; }
+
+  /* Top bar */
+  .admin-topbar { padding: 8px 12px; }
+
+  /* Sidebar footer user name: truncate */
+  .sidebar-footer-wrap { padding: 12px; }
 }
