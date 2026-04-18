@@ -91,9 +91,9 @@
                 <span style="font-size:0.75rem; color:var(--col-text-muted);" id="voice-word-count">0 words</span>
               </div>
               <div id="voiceLiveBox"
-                   style="min-height:140px; max-height:260px; overflow-y:auto; background:var(--col-surface); border:1.5px solid var(--col-border); border-radius:var(--radius-sm); padding:0.85rem 1rem; font-size:0.95rem; line-height:1.75; color:var(--col-text-primary); white-space:pre-wrap;">
+                   style="min-height:140px; max-height:260px; overflow-y:auto; background:var(--col-surface); border:1.5px solid var(--col-border); border-radius:var(--radius-sm); padding:0.85rem 1rem; font-size:0.95rem; line-height:1.75; color:var(--col-text-primary); white-space:pre-wrap; transition:border-color 0.3s;">
                 <span id="voicePlaceholder" style="color:var(--col-text-muted); font-style:italic;">Your spoken words will appear here as you speak…</span>
-                <span id="voiceFinal"></span><span id="voiceInterim" style="color:var(--col-blue-400);"></span>
+                <span id="voiceFinal"></span><span id="voiceInterim" style="color:var(--col-blue-400); opacity:0.85;"></span>
               </div>
             </div>
 
@@ -198,7 +198,7 @@
 </style>
 
 <script>
-  /* ── Tab switching ────────────────────────────────────────── */
+  /* ── Tab switching ─────────────────────────────────────────── */
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -210,14 +210,14 @@
     });
   });
 
-  /* ── Char count ────────────────────────────────────────────── */
+  /* ── Char count ─────────────────────────────────────────────── */
   function updateCharCount() {
     document.getElementById('char-count').innerText =
       document.getElementById('output').value.length + ' characters';
   }
   document.getElementById('output').addEventListener('input', updateCharCount);
 
-  /* ── Image upload ──────────────────────────────────────────── */
+  /* ── Image upload ───────────────────────────────────────────── */
   document.getElementById('essay_image').addEventListener('change', function() {
     const el = document.getElementById('fileName');
     if (this.files[0]) { el.textContent = '✓ ' + this.files[0].name; el.style.display = 'block'; }
@@ -226,54 +226,80 @@
   ['dragenter','dragover'].forEach(e => zone.addEventListener(e, ev => { ev.preventDefault(); zone.classList.add('drag-over'); }));
   ['dragleave','drop'].forEach(e => zone.addEventListener(e, () => zone.classList.remove('drag-over')));
 
-  /* ── Voice recognition ─────────────────────────────────────── */
-  let recognition;
+  /* ════════════════════════════════════════════════════════════
+     VOICE RECOGNITION
+     ─────────────────────────────────────────────────────────
+     WHY continuous = true:
+       false → Chrome buffers all audio and only sends it to
+               Google after a silence pause. Nothing appears
+               while the user is actually speaking.
+       true  → Chrome streams audio incrementally. onresult
+               fires with interim words every ~500 ms, so
+               words appear on screen as you speak.
+  ════════════════════════════════════════════════════════════ */
+  let recognition     = null;
   let finalTranscript = '';
+  let isRecording     = false;
+  let restartTimer    = null;
 
-  function updateVoiceLiveBox() {
-    const finalEl   = document.getElementById('voiceFinal');
-    const placeholder = document.getElementById('voicePlaceholder');
-    const wordCount = document.getElementById('voice-word-count');
-
-    finalEl.textContent = finalTranscript;
-    placeholder.style.display = finalTranscript ? 'none' : 'inline';
-
-    const words = finalTranscript.trim() ? finalTranscript.trim().split(/\s+/).length : 0;
-    wordCount.textContent = words + ' word' + (words !== 1 ? 's' : '');
-
-    // Scroll to bottom of live box
-    const box = document.getElementById('voiceLiveBox');
-    box.scrollTop = box.scrollHeight;
+  /* ── Helpers ──────────────────────────────────────────────── */
+  function setStatus(html) {
+    document.getElementById('voiceStatusText').innerHTML = html;
   }
 
-  function startSpeech() {
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) {
-      alert('Speech Recognition is only supported in Google Chrome. Please switch browsers.');
-      return;
-    }
-
-    finalTranscript = document.getElementById('output').value || '';
-    document.getElementById('voiceFinal').textContent = finalTranscript;
-    document.getElementById('voicePlaceholder').style.display = finalTranscript ? 'none' : 'inline';
-
-    recognition = new SR();
-    recognition.lang        = 'en-US';
-    recognition.continuous  = true;
-    recognition.interimResults = true;
-
-    // UI — recording state
+  function setRecordingUI(on) {
     const micBtn  = document.getElementById('mic-btn');
     const stopBtn = document.getElementById('stop-btn');
-    micBtn.innerHTML  = '<span class="spinner-grow spinner-grow-sm me-2"></span>Listening…';
-    micBtn.disabled   = true;
-    stopBtn.disabled  = false;
-    micBtn.classList.add('mic-pulsing');
+    const box     = document.getElementById('voiceLiveBox');
+    if (on) {
+      micBtn.innerHTML = '<span class="spinner-grow spinner-grow-sm me-2"></span>Listening…';
+      micBtn.disabled  = true;
+      micBtn.classList.add('mic-pulsing');
+      stopBtn.disabled = false;
+      box.style.borderColor = 'var(--col-danger)';
+    } else {
+      micBtn.innerHTML = '<i class="bi bi-record-circle me-1"></i> Start Recording';
+      micBtn.disabled  = false;
+      micBtn.classList.remove('mic-pulsing');
+      stopBtn.disabled = true;
+      box.style.borderColor = '';
+    }
+  }
 
-    document.getElementById('voiceStatusText').innerHTML =
-      '<i class="bi bi-record-circle-fill text-danger"></i>&nbsp;Recording in progress — speak clearly…';
+  /* Hide placeholder the moment ANY text exists (interim or final) */
+  function syncPlaceholder(interim) {
+    const hasText = finalTranscript.trim() || (interim && interim.trim());
+    document.getElementById('voicePlaceholder').style.display = hasText ? 'none' : 'inline';
+  }
 
-    recognition.onresult = function(event) {
+  function updateWordCount() {
+    const w = finalTranscript.trim() ? finalTranscript.trim().split(/\s+/).length : 0;
+    document.getElementById('voice-word-count').textContent = w + ' word' + (w !== 1 ? 's' : '');
+  }
+
+  /* ── Build one recognition session ───────────────────────── */
+  function createSession() {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) return null;
+
+    const r           = new SR();
+    r.lang            = 'en-US';
+    r.continuous      = true;   // ← MUST be true — streams results word-by-word
+    r.interimResults  = true;   // ← shows words before sentence is finished
+    r.maxAlternatives = 1;
+
+    let gotResult = false;      // used to pick restart delay
+
+    r.onaudiostart = function() {
+      setStatus('<i class="bi bi-soundwave text-danger"></i>&nbsp;Microphone open — start speaking now…');
+    };
+
+    r.onspeechstart = function() {
+      setStatus('<i class="bi bi-record-circle-fill text-danger"></i>&nbsp;<strong>Recording</strong> — words will appear below as you speak…');
+    };
+
+    r.onresult = function(event) {
+      gotResult = true;
       let interim = '';
       for (let i = event.resultIndex; i < event.results.length; i++) {
         if (event.results[i].isFinal) {
@@ -282,52 +308,97 @@
           interim += event.results[i][0].transcript;
         }
       }
-      updateVoiceLiveBox();
+      document.getElementById('voiceFinal').textContent   = finalTranscript;
       document.getElementById('voiceInterim').textContent = interim;
-
-      // Mirror into essay textarea live
+      syncPlaceholder(interim);
+      updateWordCount();
       document.getElementById('output').value = finalTranscript + interim;
       updateCharCount();
+      const box = document.getElementById('voiceLiveBox');
+      box.scrollTop = box.scrollHeight;
     };
 
-    recognition.onerror = function(event) {
-      document.getElementById('voiceStatusText').textContent =
-        'Error: ' + event.error + '. Please check microphone permissions.';
-      stopSpeech();
+    /* Chrome auto-stops after ~60 s or on long silence — restart if still recording */
+    r.onend = function() {
+      document.getElementById('voiceInterim').textContent = '';
+      if (!isRecording) return;
+      const delay = gotResult ? 200 : 800;   // longer delay if no results yet (avoids throttle loop)
+      restartTimer = setTimeout(function() { if (isRecording) startSession(); }, delay);
     };
 
-    recognition.onend = function() {
-      // If still in recording state (auto-ended), restart for continuous capture
-      if (!document.getElementById('mic-btn').disabled === false) return;
+    r.onerror = function(event) {
+      if (event.error === 'no-speech') return;  // silence — onend handles restart
+      if (event.error === 'aborted')   return;  // intentional stop
+      const msgs = {
+        'not-allowed':         'Microphone blocked. Click the 🔒 icon in the address bar and allow microphone.',
+        'network':             'Network error — Chrome needs internet access to process speech.',
+        'audio-capture':       'No microphone found. Please connect a microphone and try again.',
+        'service-not-allowed': 'Speech service blocked. Open the app via http://127.0.0.1:8000 or https://.',
+      };
+      setStatus('<i class="bi bi-exclamation-triangle-fill text-danger"></i>&nbsp;' +
+        (msgs[event.error] || 'Error: ' + event.error + '. Please try again.'));
+      isRecording = false;
+      setRecordingUI(false);
     };
 
-    recognition.start();
+    return r;
+  }
+
+  function startSession() {
+    recognition = createSession();
+    if (!recognition) return;
+    try {
+      recognition.start();
+    } catch(e) {
+      /* InvalidStateError: previous session still closing — retry after 500 ms */
+      restartTimer = setTimeout(startSession, 500);
+    }
+  }
+
+  /* ── Public controls ─────────────────────────────────────── */
+  function startSpeech() {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) {
+      setStatus('<i class="bi bi-exclamation-triangle-fill text-warning"></i>&nbsp;Speech Recognition requires Google Chrome.');
+      return;
+    }
+    clearTimeout(restartTimer);
+
+    /* Reset state */
+    finalTranscript = '';
+    document.getElementById('voiceFinal').textContent          = '';
+    document.getElementById('voiceInterim').textContent        = '';
+    document.getElementById('voicePlaceholder').style.display  = 'inline';
+    document.getElementById('voice-word-count').textContent    = '0 words';
+    document.getElementById('output').value                    = '';
+    updateCharCount();
+
+    isRecording = true;
+    setRecordingUI(true);
+    setStatus('<i class="bi bi-mic-fill text-danger"></i>&nbsp;Starting microphone…');
+    startSession();
   }
 
   function stopSpeech() {
+    isRecording = false;
+    clearTimeout(restartTimer);
     if (recognition) {
-      recognition.stop();
+      try { recognition.stop(); } catch(e) {}
+      recognition = null;
     }
+    setRecordingUI(false);
 
-    const micBtn  = document.getElementById('mic-btn');
-    const stopBtn = document.getElementById('stop-btn');
-    micBtn.innerHTML = '<i class="bi bi-record-circle me-1"></i> Start Recording';
-    micBtn.disabled  = false;
-    micBtn.classList.remove('mic-pulsing');
-    stopBtn.disabled = true;
-
-    // Clear interim
-    document.getElementById('voiceInterim').textContent = '';
-
-    // Copy final transcript into textarea
+    /* Commit transcript to textarea */
+    document.getElementById('voiceInterim').textContent       = '';
+    document.getElementById('voiceFinal').textContent         = finalTranscript;
+    syncPlaceholder('');
+    updateWordCount();
     document.getElementById('output').value = finalTranscript.trim();
     updateCharCount();
-    updateVoiceLiveBox();
 
-    document.getElementById('voiceStatusText').innerHTML =
-      '<i class="bi bi-check-circle-fill text-success"></i>&nbsp;Recording stopped. Review your text below, then click Generate AI Score.';
+    setStatus('<i class="bi bi-check-circle-fill text-success"></i>&nbsp;Done! Review your text below, then click <strong>Generate AI Score</strong>.');
 
-    // Auto-switch to Type/Paste tab so user can see & edit the result
+    /* Switch to Type/Paste tab so user can review & submit */
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.querySelector('[data-tab="text"]').classList.add('active');
     document.getElementById('tabText').style.display  = 'block';
@@ -337,12 +408,13 @@
 
   function clearVoice() {
     finalTranscript = '';
-    document.getElementById('voiceFinal').textContent   = '';
-    document.getElementById('voiceInterim').textContent = '';
-    document.getElementById('voicePlaceholder').style.display = 'inline';
-    document.getElementById('voice-word-count').textContent   = '0 words';
-    document.getElementById('output').value = '';
+    document.getElementById('voiceFinal').textContent          = '';
+    document.getElementById('voiceInterim').textContent        = '';
+    document.getElementById('voicePlaceholder').style.display  = 'inline';
+    document.getElementById('voice-word-count').textContent    = '0 words';
+    document.getElementById('output').value                    = '';
     updateCharCount();
+    setStatus('<i class="bi bi-mic"></i>&nbsp;Cleared. Press "Start Recording" to begin again.');
   }
 </script>
 

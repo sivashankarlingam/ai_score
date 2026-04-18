@@ -19,3 +19,18 @@ class UserRegistrationModel(models.Model):
     class Meta:
         db_table = 'UserRegistrations'
 
+
+class ScoreHistory(models.Model):
+    loginid = models.CharField(max_length=100)
+    username = models.CharField(max_length=100)
+    essay_snippet = models.TextField()
+    score = models.CharField(max_length=20)
+    scored_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.loginid} - {self.score} ({self.scored_at})"
+
+    class Meta:
+        db_table = 'ScoreHistory'
+        ordering = ['-scored_at']
+

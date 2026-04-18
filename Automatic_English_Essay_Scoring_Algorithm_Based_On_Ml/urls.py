@@ -44,6 +44,8 @@ urlpatterns = [
     path("DatasetView/", usr.DatasetView, name="DatasetView"),
     path("training/",usr.training,name="training"),
     path("prediction/",usr.prediction,name="prediction"),
+    path("score-history/", usr.score_history, name="score_history"),
+    path("recent-history/", usr.recent_history, name="recent_history"),
 
 
 ]

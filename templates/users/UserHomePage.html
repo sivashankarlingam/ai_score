@@ -34,7 +34,7 @@
     </div>
   </div>
 
-  <!-- Training Data -->
+  <!-- Score History -->
   <div class="col-lg-3 col-sm-6 anim-fade-up anim-delay-2">
     <div class="aes-card h-100" style="padding:1.6rem;">
       <div class="feature-icon-wrap" style="background:var(--col-success-bg); color:var(--col-success);">
@@ -50,23 +50,24 @@
     </div>
   </div>
 
-  <!-- Model Performance -->
+  <!-- Score History -->
   <div class="col-lg-3 col-sm-6 anim-fade-up anim-delay-3">
-    <div class="aes-card h-100" style="padding:1.6rem;">
-      <div class="feature-icon-wrap" style="background:var(--col-warning-bg); color:var(--col-warning);">
-        <i class="bi bi-cpu-fill"></i>
+    <div class="aes-card h-100" style="padding:1.6rem; border-top:3px solid var(--col-blue-400);">
+      <div class="feature-icon-wrap" style="background:var(--col-blue-50); color:var(--col-blue-400);">
+        <i class="bi bi-clock-history"></i>
       </div>
-      <h6 style="font-weight:700; margin-bottom:6px;">Model Performance</h6>
+      <h6 style="font-weight:700; margin-bottom:6px;">Score History</h6>
       <p style="font-size:0.83rem; color:var(--col-text-secondary); margin-bottom:1.25rem;">
-        Latest regression metrics from the current LSTM training cycle.
+        View all your past essay scores and performance over time.
       </p>
-      <a href="{% url 'training' %}" class="btn-aes-secondary" style="font-size:0.82rem; padding:7px 14px; width:100%; justify-content:center;">
-        View Stats
+      <a href="{% url 'score_history' %}" class="btn-aes-secondary" style="font-size:0.82rem; padding:7px 14px; width:100%; justify-content:center;">
+        View History
       </a>
     </div>
   </div>
 
 </div>
+
 
 <!-- ── Account Info ───────────────────────────────────────────── -->
 <div class="aes-card anim-fade-up anim-delay-4">

@@ -1,0 +1,104 @@
+{% extends 'users/userbase.html' %}
+{% block contents %}
+
+<!-- Page Header -->
+<div class="page-header anim-fade-up">
+  <p class="section-label"><i class="bi bi-clock-history me-1"></i>Score History</p>
+  <h1 class="page-header-title">Your Score History</h1>
+  <p class="page-header-sub">A complete record of all your essay submissions and AI scores.</p>
+</div>
+
+{% if history %}
+
+<!-- Summary Stats -->
+<div class="row g-3 mb-4 anim-fade-up anim-delay-1">
+  <div class="col-6 col-md-3">
+    <div class="aes-card text-center" style="padding:1.2rem;">
+      <div style="font-size:1.8rem; font-weight:800; color:var(--col-navy);">{{ history|length }}</div>
+      <div style="font-size:0.78rem; color:var(--col-text-muted); text-transform:uppercase; font-weight:600; letter-spacing:0.05em;">Total Essays</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="aes-card text-center" style="padding:1.2rem;">
+      <div style="font-size:1.8rem; font-weight:800; color:var(--col-success);">{{ history.0.score }}</div>
+      <div style="font-size:0.78rem; color:var(--col-text-muted); text-transform:uppercase; font-weight:600; letter-spacing:0.05em;">Latest Score</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="aes-card text-center" style="padding:1.2rem;">
+      <div style="font-size:1.8rem; font-weight:800; color:var(--col-blue-400);">LSTM</div>
+      <div style="font-size:0.78rem; color:var(--col-text-muted); text-transform:uppercase; font-weight:600; letter-spacing:0.05em;">Model Used</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="aes-card text-center" style="padding:1.2rem;">
+      <a href="{% url 'recent_history' %}" class="btn-aes-secondary" style="font-size:0.82rem; padding:7px 14px; width:100%; justify-content:center; text-decoration:none;">
+        <i class="bi bi-lightning-charge me-1"></i>Recent
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- History Table -->
+<div class="aes-card anim-fade-up anim-delay-2" style="padding:0; overflow:hidden;">
+  <div style="padding:1.25rem 1.5rem; border-bottom:1px solid var(--col-border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+    <p class="section-label mb-0"><i class="bi bi-table me-1"></i>All Submissions</p>
+    <span class="aes-badge" style="background:var(--col-blue-50); color:var(--col-navy);">{{ history|length }} record(s)</span>
+  </div>
+
+  <div style="overflow-x:auto;">
+    <table class="w-100" style="border-collapse:collapse; font-size:0.87rem;">
+      <thead>
+        <tr style="background:var(--col-surface-2);">
+          <th style="padding:12px 16px; text-align:left; font-weight:700; color:var(--col-text-muted); text-transform:uppercase; font-size:0.74rem; letter-spacing:0.07em;">#</th>
+          <th style="padding:12px 16px; text-align:left; font-weight:700; color:var(--col-text-muted); text-transform:uppercase; font-size:0.74rem; letter-spacing:0.07em;">Essay Snippet</th>
+          <th style="padding:12px 16px; text-align:center; font-weight:700; color:var(--col-text-muted); text-transform:uppercase; font-size:0.74rem; letter-spacing:0.07em;">Score</th>
+          <th style="padding:12px 16px; text-align:right; font-weight:700; color:var(--col-text-muted); text-transform:uppercase; font-size:0.74rem; letter-spacing:0.07em;">Date & Time</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for entry in history %}
+        <tr style="border-top:1px solid var(--col-border);" class="history-row">
+          <td style="padding:14px 16px; color:var(--col-text-muted); font-weight:600;">{{ forloop.counter }}</td>
+          <td style="padding:14px 16px; color:var(--col-text-secondary); max-width:420px;">
+            <div style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ entry.essay_snippet }}</div>
+          </td>
+          <td style="padding:14px 16px; text-align:center;">
+            <span class="aes-badge pill-score-{% if entry.score|add:0 >= 8 %}high{% elif entry.score|add:0 >= 5 %}medium{% else %}low{% endif %}" style="display:inline-block; padding:4px 16px; border-radius:20px; font-weight:800; font-size:0.92rem;">
+              {{ entry.score }}
+            </span>
+          </td>
+          <td style="padding:14px 16px; text-align:right; color:var(--col-text-muted); white-space:nowrap; font-size:0.82rem;">
+            {{ entry.scored_at|date:"M d, Y" }}<br>
+            <span style="color:var(--col-text-muted); font-size:0.77rem;">{{ entry.scored_at|time:"h:i A" }}</span>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% else %}
+
+<!-- Empty State -->
+<div class="aes-card anim-fade-up anim-delay-1 text-center" style="padding:4rem 2rem;">
+  <div style="width:72px; height:72px; border-radius:50%; background:var(--col-blue-50); display:flex; align-items:center; justify-content:center; margin:0 auto 1.25rem; font-size:2rem; color:var(--col-blue-400);">
+    <i class="bi bi-clock-history"></i>
+  </div>
+  <h5 style="font-weight:700; color:var(--col-text-primary); margin-bottom:8px;">No Essays Scored Yet</h5>
+  <p style="color:var(--col-text-secondary); font-size:0.9rem; margin-bottom:1.5rem;">
+    Submit your first essay to start building your score history.
+  </p>
+  <a href="{% url 'prediction' %}" class="btn-aes-primary">
+    <i class="bi bi-stars"></i> Score an Essay
+  </a>
+</div>
+
+{% endif %}
+
+<style>
+  .history-row:hover { background: var(--col-blue-50); transition: background 0.2s; }
+</style>
+
+{% endblock %}

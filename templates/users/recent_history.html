@@ -1,0 +1,70 @@
+{% extends 'users/userbase.html' %}
+{% block contents %}
+
+<!-- Page Header -->
+<div class="page-header anim-fade-up">
+  <p class="section-label"><i class="bi bi-lightning-charge me-1"></i>Recent History</p>
+  <h1 class="page-header-title">Recent Activity</h1>
+  <p class="page-header-sub">Your last 5 essay submissions at a glance.</p>
+</div>
+
+{% if recent %}
+
+<!-- Recent Cards Grid -->
+<div class="row g-3 mb-4 anim-fade-up anim-delay-1">
+  {% for entry in recent %}
+  <div class="col-md-6 col-lg-4">
+    <div class="aes-card h-100 {% if entry.score|add:0 >= 8 %}card-score-high{% elif entry.score|add:0 >= 5 %}card-score-medium{% else %}card-score-low{% endif %}" style="padding:1.4rem;">
+
+      <!-- Score badge -->
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem;">
+        <span style="font-size:0.75rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--col-text-muted);">
+          Essay #{{ forloop.counter }}
+        </span>
+        <span class="score-pill pill-score-{% if entry.score|add:0 >= 8 %}high{% elif entry.score|add:0 >= 5 %}medium{% else %}low{% endif %}" style="display:inline-block; padding:5px 18px; border-radius:20px; font-weight:900; font-size:1.1rem;">
+          {{ entry.score }}
+        </span>
+      </div>
+
+      <!-- Essay snippet -->
+      <p style="font-size:0.84rem; color:var(--col-text-secondary); line-height:1.65; margin-bottom:1rem;
+                 display:-webkit-box; -webkit-line-clamp:3; line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;">
+        {{ entry.essay_snippet }}
+      </p>
+
+      <!-- Timestamp -->
+      <div style="display:flex; align-items:center; gap:6px; font-size:0.78rem; color:var(--col-text-muted); margin-top:auto;">
+        <i class="bi bi-calendar3"></i>
+        {{ entry.scored_at|date:"M d, Y" }} &bull; {{ entry.scored_at|time:"h:i A" }}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Link to full history -->
+<div class="text-center anim-fade-up anim-delay-2">
+  <a href="{% url 'score_history' %}" class="btn-aes-secondary" style="padding:0.75rem 2rem;">
+    <i class="bi bi-clock-history me-1"></i> View Full History
+  </a>
+</div>
+
+{% else %}
+
+<!-- Empty State -->
+<div class="aes-card anim-fade-up anim-delay-1 text-center" style="padding:4rem 2rem;">
+  <div style="width:72px; height:72px; border-radius:50%; background:var(--col-blue-50); display:flex; align-items:center; justify-content:center; margin:0 auto 1.25rem; font-size:2rem; color:var(--col-blue-400);">
+    <i class="bi bi-lightning-charge"></i>
+  </div>
+  <h5 style="font-weight:700; color:var(--col-text-primary); margin-bottom:8px;">No Recent Activity</h5>
+  <p style="color:var(--col-text-secondary); font-size:0.9rem; margin-bottom:1.5rem;">
+    You haven't scored any essays yet. Start your first analysis now!
+  </p>
+  <a href="{% url 'prediction' %}" class="btn-aes-primary">
+    <i class="bi bi-stars"></i> Score an Essay
+  </a>
+</div>
+
+{% endif %}
+
+{% endblock %}

@@ -62,11 +62,11 @@
         <span>Training Data</span>
       </a>
 
-      <a href="{% url 'training' %}"
-         class="sidebar-link {% if request.resolver_match.url_name == 'training' %}active{% endif %}"
-         style="{% if request.resolver_match.url_name != 'training' %}color:var(--col-text-secondary);{% endif %}">
-        <i class="bi bi-cpu"></i>
-        <span>Model Stats</span>
+      <a href="{% url 'score_history' %}"
+         class="sidebar-link {% if request.resolver_match.url_name == 'score_history' %}active{% endif %}"
+         style="{% if request.resolver_match.url_name != 'score_history' %}color:var(--col-text-secondary);{% endif %}">
+        <i class="bi bi-clock-history"></i>
+        <span>Score History</span>
       </a>
 
       <p class="sidebar-section-label" style="color:var(--col-text-muted); margin-top:16px;">Account</p>
@@ -118,7 +118,8 @@
           <span>
             {% if request.resolver_match.url_name == 'prediction' %}Analyse Essay
             {% elif request.resolver_match.url_name == 'DatasetView' %}Training Data
-            {% elif request.resolver_match.url_name == 'training' %}Model Stats
+            {% elif request.resolver_match.url_name == 'score_history' %}Score History
+            {% elif request.resolver_match.url_name == 'recent_history' %}Recent History
             {% else %}Dashboard{% endif %}
           </span>
         </div>

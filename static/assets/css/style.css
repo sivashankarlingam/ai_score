@@ -667,6 +667,15 @@ textarea.aes-input {
   background: currentColor;
 }
 
+/* Score Status Utilities */
+.card-score-high   { border-left: 4px solid var(--col-success) !important; }
+.card-score-medium { border-left: 4px solid var(--col-warning) !important; }
+.card-score-low    { border-left: 4px solid var(--col-danger) !important; }
+
+.pill-score-high   { background: var(--col-success-bg); color: var(--col-success); }
+.pill-score-medium { background: var(--col-warning-bg); color: var(--col-warning); }
+.pill-score-low    { background: var(--col-danger-bg); color: var(--col-danger); }
+
 /* ── Avatar Initials ─────────────────────────────────────────── */
 .avatar-initials {
   width: 34px; height: 34px;

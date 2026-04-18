@@ -2,7 +2,7 @@ from django.shortcuts import render, HttpResponse
 from django.contrib import messages
 
 from .forms import UserRegistrationForm
-from .models import UserRegistrationModel
+from .models import UserRegistrationModel, ScoreHistory
 
 import pandas as pd
 import numpy as np
@@ -319,6 +319,18 @@ def prediction(request):
 
             score = str(round(float(pred[0][0])))
 
+        # Save to history if score is numeric
+        if score and score not in ["No valid words found", "Please enter essay text"]:
+            loginid = request.session.get('loginid', 'anonymous')
+            username = request.session.get('loggeduser', 'Unknown')
+            snippet = (final_text[:200] + '...') if len(final_text) > 200 else final_text
+            ScoreHistory.objects.create(
+                loginid=loginid,
+                username=username,
+                essay_snippet=snippet,
+                score=score
+            )
+
         return render(
             request,
             "users/predictForm.html",
@@ -326,3 +338,21 @@ def prediction(request):
         )
 
     return render(request, "users/predictForm.html")
+
+
+# =========================
+# SCORE HISTORY
+# =========================
+def score_history(request):
+    loginid = request.session.get('loginid', '')
+    history = ScoreHistory.objects.filter(loginid=loginid)
+    return render(request, 'users/score_history.html', {'history': history})
+
+
+# =========================
+# RECENT HISTORY
+# =========================
+def recent_history(request):
+    loginid = request.session.get('loginid', '')
+    recent = ScoreHistory.objects.filter(loginid=loginid)[:5]
+    return render(request, 'users/recent_history.html', {'recent': recent})
