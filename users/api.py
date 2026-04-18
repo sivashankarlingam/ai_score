@@ -12,13 +12,26 @@ from PIL import Image
 import numpy as np
 import re
 from nltk.corpus import stopwords
-from gensim.models import Word2Vec
+from gensim.models import Word2Vec, KeyedVectors
 import pandas as pd
 from django.conf import settings
 import os
 import tensorflow as tf
 
 api = NinjaAPI(title="AI Score API", version="1.0.0")
+
+# --- Global Model Loading (Optimized for Production) ---
+W2V_PATH = os.path.join(settings.BASE_DIR, "word2vecmodel.bin")
+LSTM_PATH = os.path.join(settings.BASE_DIR, "final_lstm.h5")
+
+# Load models once when the server starts
+try:
+    word2vec_model = KeyedVectors.load_word2vec_format(W2V_PATH, binary=True)
+    lstm_model = tf.keras.models.load_model(LSTM_PATH, compile=False)
+except Exception as e:
+    print(f"ERROR: Could not load ML models: {e}")
+    word2vec_model = None
+    lstm_model = None
 
 # --- Schemas ---
 class LoginSchema(Schema):
@@ -153,24 +166,29 @@ def predict(request, payload: PredictSchema):
     if not final_text or str(final_text).strip() == "":
         return 400, {"message": "Please enter essay text or upload a valid image", "success": False}
         
+    if not word2vec_model or not lstm_model:
+        return 400, {"message": "Server error: ML models not loaded correctly", "success": False}
+
     try:
-        # Load ML elements
+        # ML Preprocessing
         stop_words = set(stopwords.words("english"))
         text = re.sub("[^A-Za-z]", " ", final_text)
         words = text.lower().split()
         cleaned_words = [convert_and_clean(word) for word in words if word not in stop_words]
         
-        # We load word2vec and LSTM locally inside the function 
-        # (in production caching this is better, but this matches the Django view logic)
         num_features = 300
-        w2v_model_path = os.path.join(settings.BASE_DIR, "word2vecmodel.bin")
-        model = Word2Vec.load(w2v_model_path)
-        feature_vec_test = feature_vec(cleaned_words, model, num_features)
         
-        lstm_model_path = os.path.join(settings.BASE_DIR, "final_lstm.h5")
-        lstm_model = tf.keras.models.load_model(lstm_model_path)
-        
-        test_data = np.reshape(feature_vec_test, (1, 1, num_features))
+        # Calculate feature vector using the globally loaded model
+        feature_vector = np.zeros((num_features,), dtype="float32")
+        nwords = 0
+        for word in cleaned_words:
+            if word in word2vec_model.key_to_index:
+                nwords += 1
+                feature_vector = np.add(feature_vector, word2vec_model[word])
+        if nwords > 0:
+            feature_vector = np.divide(feature_vector, nwords)
+            
+        test_data = np.reshape(feature_vector, (1, 1, num_features))
         predicted_score = lstm_model.predict(test_data)[0][0]
         score_val = str(round(predicted_score))
         
