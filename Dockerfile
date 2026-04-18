@@ -4,8 +4,9 @@ FROM python:3.9-slim
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
-# Railway providing dynamic port, default to 8000 for local testing
+# Railway/Render providing dynamic port, default to 8000
 ENV PORT 8000
+ENV MALLOC_ARENA_MAX 2
 
 # Set work directory
 WORKDIR /code
@@ -43,5 +44,5 @@ ENV HOME=/home/user \
 # Let Docker know which port we expect (informational)
 EXPOSE 8000
 
-# Run migrations then start the project using gunicorn
-CMD ["sh", "-c", "python manage.py migrate && gunicorn --bind 0.0.0.0:$PORT Automatic_English_Essay_Scoring_Algorithm_Based_On_Ml.wsgi:application"]
+# Run migrations then start the project using gunicorn optimized for low memory
+CMD ["sh", "-c", "python manage.py migrate && gunicorn --bind 0.0.0.0:$PORT --workers 1 --threads 4 --timeout 120 --worker-tmp-dir /dev/shm Automatic_English_Essay_Scoring_Algorithm_Based_On_Ml.wsgi:application"]
