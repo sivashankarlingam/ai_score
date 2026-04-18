@@ -1,5 +1,6 @@
 from django.shortcuts import render, HttpResponse
 from django.contrib import messages
+from django.conf import settings
 
 from .forms import UserRegistrationForm
 from .models import UserRegistrationModel, ScoreHistory
@@ -280,11 +281,37 @@ def prediction(request):
                 # Fallback path if pytesseract isn't in PATH natively
                 final_text = pytesseract.image_to_string(img)
             except Exception as e:
-                return render(
-                    request,
-                    "users/predictForm.html",
-                    {"score": "OCR Error: Tesseract is not installed or configured correctly."}
-                )
+                # If Tesseract fails (e.g. on Render Native), fallback to free OCR API
+                try:
+                    import urllib.request, urllib.parse, json, base64, io
+                    img_byte_arr = io.BytesIO()
+                    img.save(img_byte_arr, format='PNG')
+                    base64_img = base64.b64encode(img_byte_arr.getvalue()).decode('utf-8')
+                    
+                    data = urllib.parse.urlencode({
+                        'apikey': 'helloworld',
+                        'language': 'eng',
+                        'base64Image': 'data:image/png;base64,' + base64_img
+                    }).encode('utf-8')
+                    
+                    req = urllib.request.Request('https://api.ocr.space/parse/image', data=data)
+                    with urllib.request.urlopen(req) as response:
+                        result = json.loads(response.read().decode('utf-8'))
+                        if not result.get("IsErroredOnProcessing"):
+                            parsed = result.get("ParsedResults", [])
+                            final_text = parsed[0].get("ParsedText", "") if parsed else ""
+                        else:
+                            return render(
+                                request,
+                                "users/predictForm.html",
+                                {"score": f"OCR API Error: {result.get('ErrorMessage')}"}
+                            )
+                except Exception as api_e:
+                    return render(
+                        request,
+                        "users/predictForm.html",
+                        {"score": f"OCR Error: Tesseract missing & API fallback failed. ({str(api_e)})"}
+                    )
 
         if not final_text or str(final_text).strip() == "":
 
