@@ -105,13 +105,17 @@ def UserHome(request):
 # =========================
 def DatasetView(request):
 
+    dataset_path = os.path.join(settings.BASE_DIR, 'media', 'training_set_rel3.tsv')
+    
     df = pd.read_csv(
-        "media/training_set_rel3.tsv",
+        dataset_path,
         sep='\t',
         encoding='ISO-8859-1'
     )
 
     df.dropna(axis=1, inplace=True)
+    if 'essay' in df.columns:
+        df['essay'] = df['essay'].str[:120] + '...'
 
     # Convert to HTML to avoid ambiguous truth value error in template
     # We limit to 100 rows to ensure the browser doesn't freeze with large datasets
