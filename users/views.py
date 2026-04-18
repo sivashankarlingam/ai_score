@@ -284,8 +284,26 @@ def prediction(request):
                 # If Tesseract fails (e.g. on Render Native), fallback to free OCR API
                 try:
                     import urllib.request, urllib.parse, json, base64, io
+                    
+                    if img.mode != 'RGB':
+                        img = img.convert('RGB')
+                        
+                    max_dim = 1200
+                    if max(img.size) > max_dim:
+                        ratio = max_dim / max(img.size)
+                        new_size = (int(img.size[0] * ratio), int(img.size[1] * ratio))
+                        img = img.resize(new_size, Image.Resampling.LANCZOS)
+                        
+                    quality = 85
                     img_byte_arr = io.BytesIO()
-                    img.save(img_byte_arr, format='PNG')
+                    while quality > 10:
+                        img_byte_arr.seek(0)
+                        img_byte_arr.truncate()
+                        img.save(img_byte_arr, format='JPEG', optimize=True, quality=quality)
+                        if len(img_byte_arr.getvalue()) < 700000:
+                            break
+                        quality -= 15
+                        
                     base64_img = base64.b64encode(img_byte_arr.getvalue()).decode('utf-8')
                     
                     data = urllib.parse.urlencode({
