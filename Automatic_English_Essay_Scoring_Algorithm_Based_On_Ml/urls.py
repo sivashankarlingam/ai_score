@@ -18,8 +18,10 @@ from django.urls import path
 from . import views as mainView
 from admins import views as admins
 from users import views as usr
+from users.api import api
 
 urlpatterns = [
+    path("api/", api.urls),
     path('admin/', admin.site.urls),
     path("", mainView.index, name="index"),
     path("index/", mainView.index, name="index"),

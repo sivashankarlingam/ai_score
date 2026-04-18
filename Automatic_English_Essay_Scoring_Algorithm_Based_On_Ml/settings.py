@@ -51,11 +51,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'admins',
     'users',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -147,3 +149,6 @@ import nltk
 nltk_data_dir = os.path.join(BASE_DIR, 'nltk_data')
 if nltk_data_dir not in set(nltk.data.path):
     nltk.data.path.append(nltk_data_dir)
+
+# CORS config
+CORS_ALLOW_ALL_ORIGINS = True

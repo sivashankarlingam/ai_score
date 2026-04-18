@@ -1,0 +1,189 @@
+from ninja import NinjaAPI, Schema
+from django.shortcuts import get_object_or_404
+from typing import List, Optional
+from datetime import datetime
+from .models import UserRegistrationModel, ScoreHistory
+import json
+import urllib.request
+import urllib.parse
+import base64
+import io
+from PIL import Image
+import numpy as np
+import re
+from nltk.corpus import stopwords
+from gensim.models import Word2Vec
+import pandas as pd
+from django.conf import settings
+import os
+import tensorflow as tf
+
+api = NinjaAPI(title="AI Score API", version="1.0.0")
+
+# --- Schemas ---
+class LoginSchema(Schema):
+    loginid: str
+    password: str
+
+class RegisterSchema(Schema):
+    name: str
+    loginid: str
+    password: str
+    mobile: str
+    email: str
+    locality: str
+    address: str
+    city: str
+    state: str
+
+class UserOutSchema(Schema):
+    name: str
+    loginid: str
+    email: str
+    city: str
+
+class PredictSchema(Schema):
+    loginid: str
+    text: Optional[str] = None
+    base64_image: Optional[str] = None  # Expected format: base64 string without data:image prefix
+
+class ScoreHistoryOutSchema(Schema):
+    score: str
+    essay_snippet: str
+    scored_at: datetime
+    
+class GenericMessage(Schema):
+    message: str
+    success: bool
+    score: Optional[str] = None
+
+# --- Helpers ---
+def convert_and_clean(word):
+    word = word.lower()
+    word = re.sub(r'[^a-z0-9]', '', word)
+    return word
+
+def feature_vec(words, model, num_features):
+    feature_vector = np.zeros((num_features,), dtype="float32")
+    nwords = 0
+    index2word_set = set(model.wv.index_to_key)
+    for word in words:
+        if word in index2word_set:
+            nwords += 1
+            feature_vector = np.add(feature_vector, model.wv[word])
+    if nwords > 0:
+        feature_vector = np.divide(feature_vector, nwords)
+    return feature_vector
+
+# --- Endpoints ---
+
+@api.post("/auth/register", response={200: GenericMessage, 400: GenericMessage})
+def register(request, payload: RegisterSchema):
+    if UserRegistrationModel.objects.filter(loginid=payload.loginid).exists():
+        return 400, {"message": "Login ID already exists", "success": False}
+    if UserRegistrationModel.objects.filter(email=payload.email).exists():
+        return 400, {"message": "Email already exists", "success": False}
+    
+    UserRegistrationModel.objects.create(
+        name=payload.name, loginid=payload.loginid, password=payload.password,
+        mobile=payload.mobile, email=payload.email, locality=payload.locality,
+        address=payload.address, city=payload.city, state=payload.state,
+        status="waiting"
+    )
+    return 200, {"message": "Registration successful. Please wait for admin approval.", "success": True}
+
+@api.post("/auth/login", response={200: UserOutSchema, 401: GenericMessage, 403: GenericMessage})
+def login(request, payload: LoginSchema):
+    user = UserRegistrationModel.objects.filter(loginid=payload.loginid, password=payload.password).first()
+    if not user:
+        return 401, {"message": "Invalid credentials", "success": False}
+    if user.status != "activated":
+        return 403, {"message": "Account not activated yet", "success": False}
+    
+    return 200, {
+        "name": user.name, "loginid": user.loginid, "email": user.email, "city": user.city
+    }
+
+@api.get("/history/{loginid}", response=List[ScoreHistoryOutSchema])
+def history(request, loginid: str):
+    qs = ScoreHistory.objects.filter(loginid=loginid).order_by('-scored_at')
+    return list(qs)
+
+@api.post("/predict", response={200: GenericMessage, 400: GenericMessage})
+def predict(request, payload: PredictSchema):
+    final_text = payload.text
+    
+    # Process Image if text is not provided but image is
+    if payload.base64_image and not final_text:
+        try:
+            img_data = base64.b64decode(payload.base64_image)
+            img = Image.open(io.BytesIO(img_data))
+            if img.mode != 'RGB': img = img.convert('RGB')
+            max_dim = 1200
+            if max(img.size) > max_dim:
+                ratio = max_dim / max(img.size)
+                new_size = (int(img.size[0] * ratio), int(img.size[1] * ratio))
+                img = img.resize(new_size, Image.Resampling.LANCZOS)
+                
+            quality = 85
+            img_byte_arr = io.BytesIO()
+            while quality > 10:
+                img_byte_arr.seek(0)
+                img_byte_arr.truncate()
+                img.save(img_byte_arr, format='JPEG', optimize=True, quality=quality)
+                if len(img_byte_arr.getvalue()) < 700000: break
+                quality -= 15
+                
+            base64_str = base64.b64encode(img_byte_arr.getvalue()).decode('utf-8')
+            data = urllib.parse.urlencode({
+                'apikey': 'helloworld', 'language': 'eng', 'base64Image': 'data:image/jpeg;base64,' + base64_str
+            }).encode('utf-8')
+            
+            req = urllib.request.Request('https://api.ocr.space/parse/image', data=data)
+            with urllib.request.urlopen(req) as response:
+                result = json.loads(response.read().decode('utf-8'))
+                if not result.get("IsErroredOnProcessing"):
+                    parsed = result.get("ParsedResults", [])
+                    final_text = parsed[0].get("ParsedText", "") if parsed else ""
+                else:
+                    return 400, {"message": f"OCR API Error: {result.get('ErrorMessage')}", "success": False}
+        except Exception as e:
+            return 400, {"message": f"OCR Error: {str(e)}", "success": False}
+            
+    if not final_text or str(final_text).strip() == "":
+        return 400, {"message": "Please enter essay text or upload a valid image", "success": False}
+        
+    try:
+        # Load ML elements
+        stop_words = set(stopwords.words("english"))
+        text = re.sub("[^A-Za-z]", " ", final_text)
+        words = text.lower().split()
+        cleaned_words = [convert_and_clean(word) for word in words if word not in stop_words]
+        
+        # We load word2vec and LSTM locally inside the function 
+        # (in production caching this is better, but this matches the Django view logic)
+        num_features = 300
+        w2v_model_path = os.path.join(settings.BASE_DIR, "word2vecmodel.bin")
+        model = Word2Vec.load(w2v_model_path)
+        feature_vec_test = feature_vec(cleaned_words, model, num_features)
+        
+        lstm_model_path = os.path.join(settings.BASE_DIR, "final_lstm.h5")
+        lstm_model = tf.keras.models.load_model(lstm_model_path)
+        
+        test_data = np.reshape(feature_vec_test, (1, 1, num_features))
+        predicted_score = lstm_model.predict(test_data)[0][0]
+        score_val = str(round(predicted_score))
+        
+        # Record history
+        user = UserRegistrationModel.objects.filter(loginid=payload.loginid).first()
+        if user:
+            ScoreHistory.objects.create(
+                loginid=user.loginid,
+                username=user.name,
+                essay_snippet=final_text[:200] + "...",
+                score=score_val
+            )
+            
+        return 200, {"message": "Success", "success": True, "score": score_val}
+    except Exception as e:
+        return 400, {"message": f"Prediction Error: {str(e)}", "success": False}
