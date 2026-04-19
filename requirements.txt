@@ -14,3 +14,4 @@ dj-database-url
 psycopg2-binary
 django-cors-headers==4.4.0
 django-ninja==1.1.0
+typing-extensions>=4.10.0

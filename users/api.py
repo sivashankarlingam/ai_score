@@ -205,3 +205,7 @@ def predict(request, payload: PredictSchema):
         return 200, {"message": "Success", "success": True, "score": score_val}
     except Exception as e:
         return 400, {"message": f"Prediction Error: {str(e)}", "success": False}
+
+@api.get("/health", response={200: GenericMessage})
+def health_check(request):
+    return 200, {"message": "API is online", "success": True}
