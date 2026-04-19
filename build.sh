@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # exit on error
 set -o errexit
+python --version
+pip --version
 
 # Install dependencies
 pip install -r requirements.txt
