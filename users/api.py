@@ -54,6 +54,28 @@ class UserOutSchema(Schema):
     loginid: str
     email: str
     city: str
+    is_admin: bool = False
+
+class AdminUserListSchema(Schema):
+    id: int
+    name: str
+    loginid: str
+    email: str
+    mobile: str
+    city: str
+    state: str
+    locality: str
+    address: str
+    status: str
+
+class UserUpdateSchema(Schema):
+    name: str
+    email: str
+    mobile: str
+    locality: str
+    address: str
+    city: str
+    state: str
 
 class PredictSchema(Schema):
     loginid: str
@@ -107,6 +129,14 @@ def register(request, payload: RegisterSchema):
 
 @api.post("/auth/login", response={200: UserOutSchema, 401: GenericMessage, 403: GenericMessage})
 def login(request, payload: LoginSchema):
+    # Admin short-circuit: hardcoded admin credentials
+    if payload.loginid == 'admin' and payload.password == 'admin':
+        return 200, {
+            "name": "Administrator", "loginid": "admin",
+            "email": "admin@aesscore.com", "city": "Admin",
+            "is_admin": True
+        }
+
     user = UserRegistrationModel.objects.filter(loginid=payload.loginid, password=payload.password).first()
     if not user:
         return 401, {"message": "Invalid credentials", "success": False}
@@ -114,7 +144,8 @@ def login(request, payload: LoginSchema):
         return 403, {"message": "Account not activated yet", "success": False}
     
     return 200, {
-        "name": user.name, "loginid": user.loginid, "email": user.email, "city": user.city
+        "name": user.name, "loginid": user.loginid, "email": user.email, "city": user.city,
+        "is_admin": False
     }
 
 @api.get("/history/{loginid}", response=List[ScoreHistoryOutSchema])
@@ -209,3 +240,34 @@ def predict(request, payload: PredictSchema):
 @api.get("/health", response={200: GenericMessage})
 def health_check(request):
     return 200, {"message": "API is online", "success": True}
+
+# --- Admin Endpoints ---
+
+@api.get("/admin/users", response=List[AdminUserListSchema])
+def admin_list_users(request):
+    return list(UserRegistrationModel.objects.all().order_by('-id'))
+
+@api.put("/admin/users/{uid}/activate", response={200: GenericMessage, 404: GenericMessage})
+def admin_activate_user(request, uid: int):
+    updated = UserRegistrationModel.objects.filter(id=uid).update(status='activated')
+    if updated:
+        return 200, {"message": "User activated successfully", "success": True}
+    return 404, {"message": "User not found", "success": False}
+
+@api.put("/admin/users/{uid}", response={200: GenericMessage, 404: GenericMessage})
+def admin_update_user(request, uid: int, payload: UserUpdateSchema):
+    updated = UserRegistrationModel.objects.filter(id=uid).update(
+        name=payload.name, email=payload.email, mobile=payload.mobile,
+        locality=payload.locality, address=payload.address,
+        city=payload.city, state=payload.state
+    )
+    if updated:
+        return 200, {"message": "User updated successfully", "success": True}
+    return 404, {"message": "User not found", "success": False}
+
+@api.delete("/admin/users/{uid}", response={200: GenericMessage, 404: GenericMessage})
+def admin_delete_user(request, uid: int):
+    deleted, _ = UserRegistrationModel.objects.filter(id=uid).delete()
+    if deleted:
+        return 200, {"message": "User deleted successfully", "success": True}
+    return 404, {"message": "User not found", "success": False}
